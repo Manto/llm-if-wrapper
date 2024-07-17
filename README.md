@@ -12,11 +12,11 @@ You can run the example locally with an Anthropic API key. Alternatively, you ca
 
 ## Running Locally
 
-To run the project locally in Anthropic:
+To run the game `9:05` locally in Anthropic:
 
 ```
 export ANTHROPIC_API_KEY=sk-...
-python local.py
+python local.py games/905.z5
 ```
 
 ## Deploy and Play from Browser
