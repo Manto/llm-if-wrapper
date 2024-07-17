@@ -2,6 +2,8 @@
 
 Improved text adventure game syntax parsing and style rewrite with LLM
 
+![LLM-IF-Wrapper in Browser](/screenshot.png "Screenshot")
+
 ## Summary
 
 Interactive fictions (IF) have been a treasure trove of unconventional and impactful storytelling, with groundbreaking work like [Galatea](https://ifdb.org/viewgame?id=urxrv27t7qtu52lb) and [Spider and Web](https://ifdb.org/viewgame?id=2xyccw3pe0uovfad). Sadly, the unforgiving command syntax makes the barrier to entry high for many players. There's been more than one time where I rushed to show my wife a text adventure game just to see her quickly loses patience because the engine cannot automatically infer the "cup" is the same as "glass", or knowing "grab X" is the same as "take X". It's long been an issue that many IF writers tried to alleviate via clever tricks, but the technology was limited. Only if we had an easy way to understand arbitrary text and deduce meaning from them...
@@ -45,7 +47,7 @@ ANTHROPIC_API_KEY=sk-...
 
 Then deploy as usual.
 
-### Change the Model ###
+### Changing the Model ###
 
 Open up `llm_serve.py`, and you can change the `MODEL_NAME` to point to another model available on HuggingFace that is supported by vLLM. Be sure to `modal deploy web` again after making the change, and Modal will rebuild the image and deploy accordingly.
 
