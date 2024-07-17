@@ -1,0 +1,191 @@
+# Config for Infocom games in an LLM style
+#
+# {{{background}}}
+# {{{gamelog}}}
+# {{{visited_rooms}}}
+# {{{inventory}}}
+# {{{command}}}
+# {{{response}}}
+# {{{verbs}}}
+# {{{nouns}}}
+# {{{alternative_commands}}}
+#
+
+
+########
+## INIT
+########
+[init]
+commands = "verbose"
+
+game_path = "./games/905.z5"
+
+llm_init = '''
+You are helping a person play a text adventure game (aka interactive fiction)
+by suggesting changes to the responses of the game engine,
+so that they become more detailed and interesting.
+'''
+
+system_prompt = '''
+You are helping a person play an interactive fiction
+by suggesting changes to the responses of the game engine,
+so that they become more detailed and interesting.
+'''
+
+background_init = '''
+Here is some background information about the game being played, delimited by triple percent signs:
+%%%
+{{{background}}}
+%%%
+'''
+
+startup = '''
+The following is the text given right at the start of the game.  Please
+suggest a changed version of this startup text, according to the instructions
+above.
+'''
+
+#########
+## STYLE
+#########
+[style]
+caveat = '''
+Don't remind the player that they are playing a game.
+Don't ask the player what they will do next.
+Don't add explanation of why you feel your new response is a good suggestion.
+'''
+
+tone_original = '''
+Keep the tone of the original response.
+'''
+
+tone_pratchett = '''
+Assume the tone of a tongue-in-cheek adventure story writer, such
+as Douglas Adams or Terry Pratchett, perhaps with a hint of a swashbuckling 
+romance writer's touch.
+'''
+
+tone_gumshoe = '''
+Assume the terse tone of Hemingway and the ambience of a hard-boiled 
+pulp-fiction novel, such as the Noir of private eye Philip Marlowe.
+'''
+
+tone_hardyboys = '''
+Assume the tone of young adult mystery books like the Hardy Boys,
+Nancy Drew, and Tom Swift series.
+'''
+
+tone_spaceopera = '''
+Assume the tone of the ebullient space operas made popular by writers
+such as E.E. 'Doc' Smith in his Lensman series, and Edgar Rice Burroughs
+in his Mars books, such as A princess of Mars.
+'''
+
+length = '''
+Keep your suggested changed response brief, so it is no more than length of original response.
+'''
+
+formatting = '''
+Try to retain the formatting of the original response.
+'''
+
+
+############
+## REWRITES
+############
+[responses]
+command_prefix = "PLAYER COMMAND: "
+
+# number of command and response pairs to give in each repeated prompt (0 for all)
+gamelog_count = 10
+
+gamelog = '''
+The recent game progression has been as follows:
+{{{gamelog}}}
+'''
+
+current_room = '''
+The player is currently in a location described as follows:
+
+{{{current_room}}}
+'''
+
+suffix = '''
+Suggest a better response that is more helpful to the player.
+Return only your response without any preface or introduction.
+'''
+
+generic = '''
+The player has just entered the following command, delimited by triple plusses,
++++
+{{{command}}} 
++++
+
+The game engine has responded with the following:
+{{{response}}}
+'''
+
+[errors]
+retries = 5 # try up to five times to fix parser errors
+
+prefixes = [
+    #zork1
+    "[!: Verb error",
+    "I don't know the word",
+    "That sentence isn't one I recognize",
+    "You used the word",
+    "There was no verb in that sentence",
+    "There were too many nouns",
+    #wishbringer
+    "(Sorry, but the word",
+    "(Sorry, but this story doesn't recognize the word",
+    "(This story doesn't know the word",
+    "(You don't need to use the word",
+    "(You don't need to refer to",
+    "(That sentence didn't make sense.",
+    #starcross
+    "I can't find a verb in that sentence"
+]
+
+generic = '''
+This response is due to a limitation of the game engine and its text parser.  
+Can you come up with a response that keeps the player engaged?  In particular,
+come up with something interesting that doesn't have an effect on the game,
+such as, for the command "capture the air", you might say "You jump about
+trying to contain the atmosphere within your grasp, but find that it slips
+through your fingers, leaving you the same as before (albeit a bit more tired
+and feeling rather foolish)."
+'''
+
+parser_preamble = '''
+This response is due to a limitation of the game engine and its text parser.  
+
+The game understands the following verbs and prepositions, where all words on the same line are synonyms.
+{{{verbs}}}
+
+The game understands the following noun phrases, where all noun phrases on the same line are synonyms.
+{{{nouns}}}
+
+'''
+
+parser_rewrite_tries = '''
+The following alternative commands (one per line) are NOT accepted by the game:
+{{{alternative_commands}}}
+
+'''
+
+parser_rewrite_possible_actions = '''
+The following commands (one per line) are possibly valid actions that the game may accept:
+
+{{{possible_actions}}}
+
+'''
+
+parser_suffix = '''
+Rewrite the player's command into one that the game accepts and aligns as closely as possible with the player's intent.
+
+First, explain why each word of your rewritten command is a good choice.
+
+Then enclose your suggested new command in triple plusses, as follows:
++++SUGGESTION+++
+'''
