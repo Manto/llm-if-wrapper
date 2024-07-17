@@ -78,6 +78,10 @@ class LLM:
         print(f"🏎️ engine started in {duration_s:.0f}s")
 
     @modal.method()
+    async def warm_up(self):
+        llm.generate.spawn("")
+
+    @modal.method()
     async def completion_stream(
         self, messages, temp=0.75, max_tokens=2048, rep_penalty=1.1
     ):

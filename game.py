@@ -4,7 +4,6 @@ import sys
 
 from state import get_current_state, config
 from utils import (
-    write_to_transcript,
     write_to_debug_log,
     concat_current_llm_prompt,
     get_llm_response,
@@ -85,7 +84,7 @@ def try_to_fix_parser_error(command, response):
             )
             concat_current_llm_prompt(failed_tries_prompt)
         concat_current_llm_prompt(config["errors"]["parser_suffix"])
-        llm_response = get_llm_response(trial=True)
+        llm_response = get_llm_response()
 
         # Attempt to parse out the newly suggested command
         # If we can't find a suggested command, we give up and return original
@@ -111,19 +110,21 @@ def try_to_fix_parser_error(command, response):
     return command
 
 
-# maintain a playlog of the original game, as it is played
-def add_to_game_log(output, command=False):
+def add_to_game_log(output, is_command=False):
+    """
+    Maintain a playlog of the original game, as it is played
+    """
     state = get_current_state()
 
     if not output:
         return
 
-    if command:
+    if is_command:
         output = f"{config['responses']['command_prefix']} {output}"
     if output.rstrip()[-1] == ">":  # remove input prompt, if there
         output = output.rstrip()[:-1]
         output = output.rstrip() + "\n"
-    state.game_chatlog.append([command, output])
+    state.game_chatlog.append([is_command, output])
 
 
 def get_rooms_and_gamelog():

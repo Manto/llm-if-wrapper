@@ -1,6 +1,3 @@
-from anthropic import Anthropic
-from bs4 import BeautifulSoup
-import curses
 import fcntl
 import jericho
 import hashlib
@@ -8,10 +5,8 @@ import modal
 import os
 import re
 import requests
-import subprocess
 import sys
 import time
-import toml
 
 from splitscreen import SplitScreen
 
@@ -23,14 +18,11 @@ from game import (
 )
 from utils import (
     write_to_debug_log,
-    write_to_transcript,
     concat_current_llm_prompt,
     get_llm_response,
 )
 from state import (
     config,
-    llm_config,
-    get_existing_state,
     get_current_state,
 )
 
@@ -43,6 +35,7 @@ def init_rewrites(game_init_text):
     concat_current_llm_prompt(config["style"]["tone_" + state.tone])
     concat_current_llm_prompt(config["style"]["length"])
     concat_current_llm_prompt(config["style"]["formatting"])
+    concat_current_llm_prompt(config["style"]["caveat"])
     concat_current_llm_prompt(config["init"]["startup"])
 
     if game_init_text[-1] == ">":  # remove input prompt, if there
@@ -95,7 +88,8 @@ def start_new_game():
 
     # Initial response, rewritten with LLM
     game_response, info = state.env.reset()
-    add_to_game_log(game_response, command=False)
+    add_to_game_log(game_response, is_command=False)
+
     if state.tone is None:
         llm_response = game_response
     else:
@@ -136,4 +130,8 @@ def process_input(input_command):
         llm_response = game_response
     else:
         llm_response = rewrite_response(input_command, game_response)
+
+    add_to_game_log(game_command, is_command=True)
+    add_to_game_log(game_response, is_command=False)
+
     return input_command, game_command, game_response, llm_response, is_game_over

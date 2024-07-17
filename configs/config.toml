@@ -16,33 +16,17 @@
 ## INIT
 ########
 [init]
-commands = "verbose"
-
-game_path = "./games/905.z5"
-
-llm_init = '''
-You are helping a person play a text adventure game (aka interactive fiction)
-by suggesting changes to the responses of the game engine,
-so that they become more detailed and interesting.
-'''
-
 system_prompt = '''
 You are helping a person play an interactive fiction
 by suggesting changes to the responses of the game engine,
 so that they become more detailed and interesting.
 '''
 
-background_init = '''
-Here is some background information about the game being played, delimited by triple percent signs:
-%%%
-{{{background}}}
-%%%
-'''
-
 startup = '''
-The following is the text given right at the start of the game.  Please
-suggest a changed version of this startup text, according to the instructions
+The following is the text given right at the start of the game.
+Suggest a changed version of this startup text, according to the instructions
 above.
+Return only your response without any preface or introduction.
 '''
 
 #########
@@ -82,7 +66,7 @@ in his Mars books, such as A princess of Mars.
 '''
 
 length = '''
-Keep your suggested changed response brief, so it is no more than length of original response.
+Keep your suggested changed response brief, so it about the same length of original response.
 '''
 
 formatting = '''

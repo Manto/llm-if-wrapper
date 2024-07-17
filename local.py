@@ -1,5 +1,6 @@
+import argparse
 import curses
-from state import init_game_state, get_current_state
+from state import init_game_state, set_current_state
 from splitscreen import SplitScreen
 import engine
 from utils import format_with_linebreaks
@@ -14,7 +15,6 @@ def show_output(input_command, game_command, game_response, llm_response):
     columns = splitscreen.col_width
     if input_command:
         input_command = format_with_linebreaks(input_command, columns)
-        # write_to_transcript(input_command)
     if game_command:
         game_command = format_with_linebreaks(game_command, columns)
     else:
@@ -22,18 +22,12 @@ def show_output(input_command, game_command, game_response, llm_response):
     game_response = format_with_linebreaks(game_response, columns)
     llm_response = format_with_linebreaks(llm_response, columns)
 
-    # write_to_transcript(llm_response)
-    # add_to_game_log(game_command, command=True)
-    # add_to_game_log(game_response, command=False)
-
     if game_command:
         splitscreen.output_text("> " + game_command, "> " + input_command)
     splitscreen.output_text(game_response, llm_response)
 
 
 def game_loop():
-    state = get_current_state()
-
     is_game_over = False
     while not is_game_over:
         # Attempt player command
@@ -45,12 +39,13 @@ def game_loop():
 
 
 # Entry point
-def main(stdscr):
+def main(stdscr, game_path, llm="anthropic", tone="pratchett"):
+    print(game_path, llm, tone)
+
     splitscreen.initialize(stdscr)
+    new_state = init_game_state(game_path, llm, tone)
+    set_current_state(new_state)
 
-    init_game_state()
-
-    # We only support starting new game for command line play
     input_command, game_command, game_response, llm_response, is_game_over = (
         engine.start_new_game()
     )
@@ -59,4 +54,11 @@ def main(stdscr):
 
 
 if __name__ == "__main__":
-    curses.wrapper(main)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("game_path")
+    parser.add_argument("-l", "--llm", help="LLM provider", default="anthropic")
+    parser.add_argument("-t", "--tone", help="Tone of rewrite", default="pratchett")
+
+    args = parser.parse_args()
+
+    curses.wrapper(main, args.game_path, args.llm, args.tone)

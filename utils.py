@@ -1,9 +1,11 @@
-# Utility functions
-
 import io
-import logging
 import textwrap
-from state import get_current_state, llm_client, llm_config, config
+import os
+from anthropic import Anthropic
+from state import get_current_state, llm_config, config
+from llm_serve import LLM
+
+ANTHROPIC_MODEL = "claude-3-5-sonnet-20240620"
 
 
 def format_with_linebreaks(text: str, width: int) -> str:
@@ -22,61 +24,45 @@ def write_to_debug_log(output):
         state.debug_log.flush()
 
 
-def write_to_transcript(output):
-    state = get_current_state()
-    if state.transcript:
-        state.transcript.write(output)
-        state.transcript.flush()
-
-
-def get_file_text(filename: str, regexp: str) -> str:
-    if os.path.isfile(filename):
-        with open(filename, "r") as file:
-            text = file.read()
-        match = re.search(regexp, text, re.DOTALL)
-        if match:
-            result = match.group(1)
-            return regexp.replace("(.*)", result)
-        else:
-            logging.warn(f"Regexp {regexp} not matched in file '{filename}'")
-    else:
-        logging.warn(f"File {filename} not found as background info.")
-    return ""
-
-
-def get_llm_response(trial=False):
+def get_llm_response():
     """
     Sends out the current LLM prompt being built then return response
 
-    TODO: Something odd about not sending previous chat sequences to LLM
-    Will take more token but should improve consistency.
-
-    Args:
-        trial: if True, don't add the prompt to the chatlog
+    TODO: Do we want to send previous game log for more consistency?
     """
 
     state = get_current_state()
     prompt = {"role": "user", "content": state.llm_prompt}
-    if not trial:
-        state.llm_chatlog.append(prompt)
 
-    # make a request with the prompt
-    resp = llm_client.messages.create(
-        model=llm_config["config"]["name"],
-        system=config["init"]["llm_init"],
-        max_tokens=llm_config["config"]["max_tokens"],
-        messages=[prompt],
-        temperature=llm_config["config"]["temp"],
-    )
-    tokens = resp.usage.input_tokens
-    response = resp.content[0].text
+    if state.llm_provider == "anthropic":
+        # make a request with the prompt
+        llm_client = Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
 
-    write_to_debug_log(f"===LLM RESPONSE in {tokens} tokens===\n")
+        resp = llm_client.messages.create(
+            model=ANTHROPIC_MODEL,
+            system=config["init"]["system_prompt"],
+            max_tokens=llm_config["config"]["max_tokens"],
+            messages=[prompt],
+            temperature=llm_config["config"]["temp"],
+        )
+        tokens = resp.usage.input_tokens
+        response = resp.content[0].text
+    elif state.llm_provider == "hosted":
+        llm = LLM()
+        response = ""
+        for segment in llm.completion_stream.remote_gen(
+            [{"role": "system", "content": config["init"]["system_prompt"]}, prompt],
+            temp=llm_config["config"]["temp"],
+            max_tokens=llm_config["config"]["max_tokens"],
+        ):
+            response += segment
+    else:
+        raise Exception(f"Unsupported LLM provider: {state.llm_provider}")
+
+    write_to_debug_log(f"=== LLM RESPONSE ({state.llm_provider}) ===\n")
     write_to_debug_log(response + "\n\n")
 
     message = {"role": "assistant", "content": response}
-    if not trial:
-        state.llm_chatlog.append(message)
 
     # reset the current LLM prompt
     state.llm_prompt = ""

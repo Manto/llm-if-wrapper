@@ -1,7 +1,4 @@
 [config]
-api = 'anthropic'
-name = "claude-3-5-sonnet-20240620"
-
 # Non-zero temperature for a little bit of variability
 temp = 0.05
 
