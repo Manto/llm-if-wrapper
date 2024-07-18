@@ -12,7 +12,9 @@ class GameState:
 
         self.env = None  # the jericho Frotz environment
         self.game_path = ""
-        self.tone = "original"  # One of "original", "pratchett", "gumshoe", "hardyboys", "spaceopera"
+        self.tone = (
+            None  # One of "original", "pratchett", "gumshoe", "hardyboys", "spaceopera"
+        )
         self.llm_provider = ""  # Supports "anthropic" or "hosted"
 
         self.game_chatlog = []  # the log of game inputs and outputs
