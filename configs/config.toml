@@ -66,11 +66,11 @@ in his Mars books, such as A princess of Mars.
 '''
 
 length = '''
-Keep your suggested changed response brief, so it about the same length of original response.
+Keep suggested changed response to no more than several words longer than original response.
 '''
 
 formatting = '''
-Try to retain the formatting of the original response.
+Always retain the formatting of the original response.
 '''
 
 
@@ -115,6 +115,7 @@ retries = 5 # try up to five times to fix parser errors
 prefixes = [
     #zork1
     "[!: Verb error",
+    "[!: Noun error",
     "I don't know the word",
     "That sentence isn't one I recognize",
     "You used the word",

@@ -51,7 +51,16 @@ Then deploy as usual.
 
 Open up `llm_serve.py`, and you can change the `MODEL_NAME` to point to another model available on HuggingFace that is supported by vLLM. Be sure to `modal deploy web` again after making the change, and Modal will rebuild the image and deploy accordingly.
 
-## TODO / Known Issues ##
+## TODO ##
+- [*] Visually distinguish game response from player commands
 - [ ] Hook up debug log viewing from the web
-- [ ] Instead of string match to detect parser error, fine-tune an LLM for this.
-- [ ] LLM will make up unrelated content, especially for certain tone like "space opera".
+- [ ] Add support for OpenAI models
+
+## Known Issues ##
+* The rewrite sometimes make up unrelated content or completely lose the structure of original game text, especially when using less capable models.
+* Certain console based display (e.g., the help menu in Lost Pig) will not display correctly.
+
+## Other Ideas ##
+* Instead of string match to detect parser error, fine-tune an LLM for this.
+* Could fork [Parchment](https://github.com/curiousdannii/parchment) for a fully browser based experience, skipping the need for a backend.
+* Generate images via Stable Diffusion along with room descriptions.

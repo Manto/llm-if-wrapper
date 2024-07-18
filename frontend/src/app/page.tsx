@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, ReactNode } from 'react'
 import {
   Dialog,
   Flex,
@@ -13,27 +13,10 @@ import {
   Switch,
   TextField
 } from '@radix-ui/themes'
+import { GameContentDisplay } from './gameDisplay'
+import { StopwatchIcon } from '@radix-ui/react-icons'
 
-const GAMES = [
-  { id: '905.z5', label: '9:05 by Adam Cadre' },
-  { id: 'lostpig.z8', label: 'Lost Pig by Admiral Jota' },
-  { id: 'zork1.z5', label: 'Zork I' }
-]
-
-const TONES = [
-  { id: 'pratchett', label: 'Cheeky' },
-  { id: 'original', label: 'Original' },
-  { id: 'gumshoe', label: 'Hard Boiled' },
-  { id: 'hardyboys', label: 'YA Mysteries' },
-  { id: 'spaceopera', label: 'Space Opera' }
-]
-
-const LLMS = [
-  { id: 'anthropic', label: 'Claude 3.5 Sonnet' },
-  { id: 'hosted', label: 'Hosted' }
-]
-
-const API_URL = 'https://manto--llm-text-adv-web-dev.modal.run'
+import { GAMES, TONES, LLMS, API_URL } from './settings'
 
 const App = () => {
   const [game, setGame] = useState(GAMES[0].id)
@@ -46,9 +29,10 @@ const App = () => {
   const [showDebug, setShowDebug] = useState(false)
   const [gameStateId, setGameStateId] = useState()
   const [command, setCommand] = useState('')
-  const [debug, setDebug] = useState('')
-  const [gameText, setGameText] = useState('')
-  const [originalText, setOriginalText] = useState('')
+  const [debug, setDebug] = useState<any[]>([])
+  const [gameText, setGameText] = useState<any[]>([])
+  const [originalText, setOriginalText] = useState<any[]>([])
+  const commandInputRef = useRef<null | HTMLInputElement>(null)
   const mounted = useRef(false)
 
   const onMount = async () => {
@@ -81,8 +65,8 @@ const App = () => {
       })
       const data = await response.json()
       setGameStateId(data['id'])
-      setGameText(gameText + '\n' + data['llm_response'] + '\n')
-      setOriginalText(originalText + '\n' + data['game_response'] + '\n')
+      setGameText([...gameText, data['llm_response']])
+      setOriginalText([...originalText, data['game_response']])
     } finally {
       setIsStartingGame(false)
       setIsStartGameOpen(false)
@@ -104,15 +88,20 @@ const App = () => {
       })
 
       const data = await response.json()
-      setOriginalText(
-        `${originalText}\n> ${data['game_command']}\n\n${data['game_response']}\n`
-      )
-      setGameText(
-        `${gameText}\n> ${data['input_command']}\n\n${data['llm_response']}\n`
-      )
+      setOriginalText([
+        ...originalText,
+        <b>&gt; {data['game_command']}</b>,
+        data['game_response']
+      ])
+      setGameText([
+        ...gameText,
+        <b>&gt; {data['input_command']}</b>,
+        data['llm_response']
+      ])
       setCommand('')
     } finally {
       setIsProcessingCommand(false)
+      setTimeout(() => commandInputRef.current?.focus(), 20)
     }
   }
 
@@ -121,6 +110,9 @@ const App = () => {
       processCommand()
     }
   }
+
+  const showGameDisplayNames =
+    [showOriginal, showDebug].filter(x => x).length > 0
 
   return (
     <>
@@ -135,7 +127,7 @@ const App = () => {
             <Dialog.Content maxWidth='450px'>
               <Dialog.Title>Start Game</Dialog.Title>
               <Dialog.Description size='2' mb='4'>
-                Select a game and a tone for the story.
+                Select a game and a rewrite tone for the story.
               </Dialog.Description>
 
               <Flex direction='column' gap='3'>
@@ -166,7 +158,7 @@ const App = () => {
                 </label>
                 <label>
                   <Text as='div' size='2' mb='1' weight='bold'>
-                    Tone
+                    Rewrite Tone
                   </Text>
                   <Select.Root defaultValue={tone} onValueChange={setTone}>
                     <Select.Trigger />
@@ -273,9 +265,27 @@ const App = () => {
             </Flex>
           </Flex>
           <Flex className='min-w-full max-h-[600px] min-h-[400px] bg-gray-100 screen flex flex-row gap-4 pl-4 pr-4'>
-            {showOriginal && <GameContentDisplay content={originalText} />}
-            <GameContentDisplay content={gameText} />
-            {showDebug && <GameContentDisplay content={debug} />}
+            {showOriginal && (
+              <GameContentDisplay
+                content={originalText}
+                showName={showGameDisplayNames}
+                name='Original Game Text'
+                description='This is how the game content looks as originally designed and written by the creator.'
+              />
+            )}
+            <GameContentDisplay
+              content={gameText}
+              showName={showGameDisplayNames}
+              name='LLM Wrapped Game Text'
+              description='This is how the game content looks with LLM parsing and rewrite.'
+            />
+            {showDebug && (
+              <GameContentDisplay
+                content={debug}
+                name='Debug Log'
+                showName={showGameDisplayNames}
+              />
+            )}
           </Flex>
           <Box className='bg-white'>
             <TextField.Root
@@ -286,31 +296,16 @@ const App = () => {
               className='m-8'
               placeholder='What do you do next?'
               size='3'
+              ref={commandInputRef}
             >
-              <TextField.Slot>{isProcessingCommand && <>⌛</>}</TextField.Slot>
+              <TextField.Slot>
+                {isProcessingCommand && <StopwatchIcon />}
+              </TextField.Slot>
             </TextField.Root>
           </Box>
         </Flex>
       )}
     </>
-  )
-}
-
-const GameContentDisplay = ({ content }: { content: string }) => {
-  const contentEndRef = useRef<null | HTMLDivElement>(null)
-
-  useEffect(() => {
-    setTimeout(
-      () => contentEndRef.current?.scrollIntoView({ behavior: 'smooth' }),
-      100
-    )
-  }, [content])
-
-  return (
-    <Box className='bg-white overflow-y-scroll w-2/6 p-4 whitespace-pre-wrap grow rounded shadow-md outline outline-gray-300 outline-1'>
-      {content}
-      <div ref={contentEndRef} />
-    </Box>
   )
 }
 

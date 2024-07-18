@@ -51,6 +51,9 @@ def rewrite_response(command, response):
     User command should have gone through parser error check.
     """
     input = False
+    if not response:
+        return response
+
     if response[-1] == ">":  # remove input prompt, if there
         response = response[:-1]
         input = True
@@ -90,7 +93,7 @@ def start_new_game():
     game_response, info = state.env.reset()
     add_to_game_log(game_response, is_command=False)
 
-    if state.tone is None:
+    if state.tone == "none":
         llm_response = game_response
     else:
         llm_response = init_rewrites(game_response)
@@ -126,7 +129,7 @@ def process_input(input_command):
 
     # Finally, perform LLM rewrite for the game response
     # Note that we're writing with the original user input
-    if state.tone is None:
+    if state.tone == "none":
         llm_response = game_response
     else:
         llm_response = rewrite_response(input_command, game_response)
