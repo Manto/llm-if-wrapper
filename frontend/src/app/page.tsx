@@ -23,11 +23,39 @@ const GAMES = [
 ]
 
 const TONES = [
-  { id: 'pratchett', label: 'Cheeky' },
-  { id: 'original', label: 'Original' },
-  { id: 'gumshoe', label: 'Hard Boiled' },
-  { id: 'hardyboys', label: 'YA Mysteries' },
-  { id: 'spaceopera', label: 'Space Opera' },
+  {
+    id: 'pratchett',
+    label: (
+      <>
+        <b>pratchett</b>: Cheeky, Sarcastic
+      </>
+    )
+  },
+  {
+    id: 'gumshoe',
+    label: (
+      <>
+        <b>gumshoe</b>: Hard-boiled Noir
+      </>
+    )
+  },
+  {
+    id: 'hardyboys',
+    label: (
+      <>
+        <b>hardyboys</b>: YA Mysteries
+      </>
+    )
+  },
+  {
+    id: 'spaceopera',
+    label: (
+      <>
+        <b>spaceopera</b>: Sci-fi Melodrama
+      </>
+    )
+  },
+  { id: 'original', label: 'Rewrite with Original Tone' },
   { id: 'none', label: '- No Rewrite -' }
 ]
 
@@ -52,6 +80,7 @@ const App = () => {
   const [debug, setDebug] = useState('')
   const [gameText, setGameText] = useState('')
   const [originalText, setOriginalText] = useState('')
+  const commandInputRef = useRef<null | HTMLInputElement>(null)
   const mounted = useRef(false)
 
   const onMount = async () => {
@@ -116,6 +145,7 @@ const App = () => {
       setCommand('')
     } finally {
       setIsProcessingCommand(false)
+      setTimeout(() => commandInputRef.current?.focus(), 20)
     }
   }
 
@@ -310,6 +340,7 @@ const App = () => {
               className='m-8'
               placeholder='What do you do next?'
               size='3'
+              ref={commandInputRef}
             >
               <TextField.Slot>
                 {isProcessingCommand && <StopwatchIcon />}

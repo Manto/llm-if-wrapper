@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import { Box, Flex, Text, HoverCard } from '@radix-ui/themes'
+import { Box, Flex, Text, HoverCard, Button } from '@radix-ui/themes'
 import { QuestionMarkCircledIcon } from '@radix-ui/react-icons'
 
 type GameContentDisplayProps = {
@@ -19,12 +19,12 @@ export const GameContentDisplay: React.FC<GameContentDisplayProps> = ({
 }) => {
   const contentEndRef = useRef<null | HTMLDivElement>(null)
 
+  const scrollToBottom = () => {
+    contentEndRef.current?.scrollIntoView()
+  }
+
   useEffect(() => {
-    console.log('Okay scrolling ' + name)
-    setTimeout(
-      () => contentEndRef.current?.scrollIntoView({ behavior: 'smooth' }),
-      0
-    )
+    scrollToBottom()
   }, [content])
 
   return (
