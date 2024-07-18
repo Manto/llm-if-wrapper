@@ -13,6 +13,8 @@ import {
   Switch,
   TextField
 } from '@radix-ui/themes'
+import { GameContentDisplay } from './gameDisplay'
+import { StopwatchIcon } from '@radix-ui/react-icons'
 
 const GAMES = [
   { id: '905.z5', label: '9:05 by Adam Cadre' },
@@ -25,7 +27,8 @@ const TONES = [
   { id: 'original', label: 'Original' },
   { id: 'gumshoe', label: 'Hard Boiled' },
   { id: 'hardyboys', label: 'YA Mysteries' },
-  { id: 'spaceopera', label: 'Space Opera' }
+  { id: 'spaceopera', label: 'Space Opera' },
+  { id: 'none', label: '- No Rewrite -' }
 ]
 
 const LLMS = [
@@ -122,6 +125,9 @@ const App = () => {
     }
   }
 
+  const showGameDisplayNames =
+    [showOriginal, showDebug].filter(x => x).length > 0
+
   return (
     <>
       {!gameStateId && (
@@ -135,7 +141,7 @@ const App = () => {
             <Dialog.Content maxWidth='450px'>
               <Dialog.Title>Start Game</Dialog.Title>
               <Dialog.Description size='2' mb='4'>
-                Select a game and a tone for the story.
+                Select a game and a rewrite tone for the story.
               </Dialog.Description>
 
               <Flex direction='column' gap='3'>
@@ -166,7 +172,7 @@ const App = () => {
                 </label>
                 <label>
                   <Text as='div' size='2' mb='1' weight='bold'>
-                    Tone
+                    Rewrite Tone
                   </Text>
                   <Select.Root defaultValue={tone} onValueChange={setTone}>
                     <Select.Trigger />
@@ -273,9 +279,27 @@ const App = () => {
             </Flex>
           </Flex>
           <Flex className='min-w-full max-h-[600px] min-h-[400px] bg-gray-100 screen flex flex-row gap-4 pl-4 pr-4'>
-            {showOriginal && <GameContentDisplay content={originalText} />}
-            <GameContentDisplay content={gameText} />
-            {showDebug && <GameContentDisplay content={debug} />}
+            {showOriginal && (
+              <GameContentDisplay
+                content={originalText}
+                showName={showGameDisplayNames}
+                name='Original Game Text'
+                description='This is how the game content looks as originally designed and written by the creator.'
+              />
+            )}
+            <GameContentDisplay
+              content={gameText}
+              showName={showGameDisplayNames}
+              name='Rewritten Game Text'
+              description='This is how the game content looks with an LLM rewrite.'
+            />
+            {showDebug && (
+              <GameContentDisplay
+                content={debug}
+                name='Debug Log'
+                showName={showGameDisplayNames}
+              />
+            )}
           </Flex>
           <Box className='bg-white'>
             <TextField.Root
@@ -287,30 +311,14 @@ const App = () => {
               placeholder='What do you do next?'
               size='3'
             >
-              <TextField.Slot>{isProcessingCommand && <>⌛</>}</TextField.Slot>
+              <TextField.Slot>
+                {isProcessingCommand && <StopwatchIcon />}
+              </TextField.Slot>
             </TextField.Root>
           </Box>
         </Flex>
       )}
     </>
-  )
-}
-
-const GameContentDisplay = ({ content }: { content: string }) => {
-  const contentEndRef = useRef<null | HTMLDivElement>(null)
-
-  useEffect(() => {
-    setTimeout(
-      () => contentEndRef.current?.scrollIntoView({ behavior: 'smooth' }),
-      100
-    )
-  }, [content])
-
-  return (
-    <Box className='bg-white overflow-y-scroll w-2/6 p-4 whitespace-pre-wrap grow rounded shadow-md outline outline-gray-300 outline-1'>
-      {content}
-      <div ref={contentEndRef} />
-    </Box>
   )
 }
 
