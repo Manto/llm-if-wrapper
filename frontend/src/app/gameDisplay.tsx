@@ -5,7 +5,7 @@ import { Box, Flex, Text, HoverCard, Button } from '@radix-ui/themes'
 import { QuestionMarkCircledIcon } from '@radix-ui/react-icons'
 
 type GameContentDisplayProps = {
-  content: string
+  content: any[]
   name?: string
   description?: string
   showName?: boolean
@@ -46,10 +46,14 @@ export const GameContentDisplay: React.FC<GameContentDisplayProps> = ({
           )}
         </Flex>
       )}
-      <Box className='bg-white overflow-y-scroll w-full p-4 whitespace-pre-wrap grow rounded shadow-md outline outline-gray-300 outline-1'>
+      <Flex
+        gap='4'
+        direction='column'
+        className='bg-white overflow-y-scroll w-full p-4 whitespace-pre-wrap grow rounded shadow-md outline outline-gray-300 outline-1'
+      >
         {content}
         <div ref={contentEndRef} />
-      </Box>
+      </Flex>
     </Flex>
   )
 }

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, ReactNode } from 'react'
 import {
   Dialog,
   Flex,
@@ -29,9 +29,9 @@ const App = () => {
   const [showDebug, setShowDebug] = useState(false)
   const [gameStateId, setGameStateId] = useState()
   const [command, setCommand] = useState('')
-  const [debug, setDebug] = useState('')
-  const [gameText, setGameText] = useState('')
-  const [originalText, setOriginalText] = useState('')
+  const [debug, setDebug] = useState<any[]>([])
+  const [gameText, setGameText] = useState<any[]>([])
+  const [originalText, setOriginalText] = useState<any[]>([])
   const commandInputRef = useRef<null | HTMLInputElement>(null)
   const mounted = useRef(false)
 
@@ -65,8 +65,8 @@ const App = () => {
       })
       const data = await response.json()
       setGameStateId(data['id'])
-      setGameText(gameText + '\n' + data['llm_response'] + '\n')
-      setOriginalText(originalText + '\n' + data['game_response'] + '\n')
+      setGameText([...gameText, data['llm_response']])
+      setOriginalText([...originalText, data['game_response']])
     } finally {
       setIsStartingGame(false)
       setIsStartGameOpen(false)
@@ -88,12 +88,16 @@ const App = () => {
       })
 
       const data = await response.json()
-      setOriginalText(
-        `${originalText}\n> ${data['game_command']}\n\n${data['game_response']}\n`
-      )
-      setGameText(
-        `${gameText}\n> ${data['input_command']}\n\n${data['llm_response']}\n`
-      )
+      setOriginalText([
+        ...originalText,
+        <b>&gt; {data['game_command']}</b>,
+        data['game_response']
+      ])
+      setGameText([
+        ...gameText,
+        <b>&gt; {data['input_command']}</b>,
+        data['llm_response']
+      ])
       setCommand('')
     } finally {
       setIsProcessingCommand(false)
@@ -272,8 +276,8 @@ const App = () => {
             <GameContentDisplay
               content={gameText}
               showName={showGameDisplayNames}
-              name='Rewritten Game Text'
-              description='This is how the game content looks with an LLM rewrite.'
+              name='LLM Wrapped Game Text'
+              description='This is how the game content looks with LLM parsing and rewrite.'
             />
             {showDebug && (
               <GameContentDisplay
