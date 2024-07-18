@@ -52,8 +52,9 @@ Then deploy as usual.
 Open up `llm_serve.py`, and you can change the `MODEL_NAME` to point to another model available on HuggingFace that is supported by vLLM. Be sure to `modal deploy web` again after making the change, and Modal will rebuild the image and deploy accordingly.
 
 ## TODO ##
+- [*] Visually distinguish game response from player commands
 - [ ] Hook up debug log viewing from the web
-- [ ] Visually distinguish game response from commands
+- [ ] Add support for OpenAI models
 
 ## Known Issues ##
 * The rewrite sometimes make up unrelated content or completely lose the structure of original game text, especially when using less capable models.
