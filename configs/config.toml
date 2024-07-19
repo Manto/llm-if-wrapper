@@ -40,9 +40,9 @@ Assume the terse tone of Hemingway and the ambience of a hard-boiled
 pulp-fiction novel, such as the Noir of private eye Philip Marlowe.
 '''
 
-tone_hardyboys = '''
-Assume the tone of young adult mystery books like the Hardy Boys,
-Nancy Drew, and Tom Swift series.
+tone_legal = '''
+Assume the tone of legal briefs, use very formal and official languages.
+Don't refer to player as Coulsel or use legal positions unless actually referenced in the original response.
 '''
 
 tone_spaceopera = '''

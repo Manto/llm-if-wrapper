@@ -9,7 +9,7 @@ export const TONES = [
     id: 'pratchett',
     label: (
       <>
-        <b>pratchett</b>: Cheeky, Sarcastic
+        <b>pratchett</b>: cheeky, sarcastic
       </>
     )
   },
@@ -17,15 +17,15 @@ export const TONES = [
     id: 'gumshoe',
     label: (
       <>
-        <b>gumshoe</b>: Hard-boiled Noir
+        <b>gumshoe</b>: hard-boiled noir
       </>
     )
   },
   {
-    id: 'hardyboys',
+    id: 'legal',
     label: (
       <>
-        <b>hardyboys</b>: YA Mysteries
+        <b>legal</b>: formal, lawyer speak
       </>
     )
   },
@@ -33,12 +33,19 @@ export const TONES = [
     id: 'spaceopera',
     label: (
       <>
-        <b>spaceopera</b>: Sci-fi Melodrama
+        <b>spaceopera</b>: sci-fi melodrama
       </>
     )
   },
-  { id: 'original', label: 'Rewrite with Original Tone' },
-  { id: 'none', label: '- No Rewrite -' }
+  {
+    id: 'original',
+    label: (
+      <>
+        <b>original</b>: keep original tone
+      </>
+    )
+  },
+  { id: 'none', label: '- no rewrite -' }
 ]
 
 export const LLMS = [

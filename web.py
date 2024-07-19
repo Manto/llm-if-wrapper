@@ -1,3 +1,4 @@
+import mmap
 import json
 from pathlib import Path
 
@@ -102,6 +103,35 @@ def web():
         llm.warm_up.remote_gen()
         return "Done"
 
+    @web_app.post("/tail_log")
+    async def tail_log(request: Request):
+        body = await request.json()
+        game_state_id = body["game_state_id"]
+        # TODO: Add a pagination / scroll back mechanism
+        # Simplest implementation for now to just return last 250 rows of text.
+
+        output = ""
+        filename = f"logs/debug-{game_state_id}.log"
+        with open(filename, "rb") as f:
+            mm = mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ)
+
+            try:
+                # Start from the end of the file
+                current_pos = mm.size() - 1
+                lines_found = 0
+
+                # Move backwards until we find N newlines or reach the start
+                while current_pos >= 0 and lines_found < 250:
+                    if mm[current_pos] == ord("\n"):
+                        lines_found += 1
+                    current_pos -= 1
+
+                # Read from the position after the Nth newline to the end
+                return {"log": mm[current_pos + 2 :].decode("utf-8")}
+
+            finally:
+                mm.close()
+
     @web_app.post("/inference")
     async def inference(request: Request):
         body = await request.json()
@@ -126,5 +156,4 @@ def web():
         )
 
     web_app.mount("/", StaticFiles(directory="/assets", html=True))
-    web_app.mount("/logs", StaticFiles(directory="/root/logs"))
     return web_app

@@ -1,21 +1,21 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { ReactNode, useEffect, useRef } from 'react'
 import { Box, Flex, Text, HoverCard, Button } from '@radix-ui/themes'
 import { QuestionMarkCircledIcon } from '@radix-ui/react-icons'
 
 type GameContentDisplayProps = {
-  content: any[]
+  visibleSections: string[]
   name?: string
   description?: string
-  showName?: boolean
+  children?: JSX.Element
 }
 
 export const GameContentDisplay: React.FC<GameContentDisplayProps> = ({
-  content,
   name,
   description,
-  showName
+  visibleSections,
+  children
 }) => {
   const contentEndRef = useRef<null | HTMLDivElement>(null)
 
@@ -25,11 +25,11 @@ export const GameContentDisplay: React.FC<GameContentDisplayProps> = ({
 
   useEffect(() => {
     scrollToBottom()
-  }, [content])
+  }, [children, visibleSections])
 
   return (
     <Flex gap='2' direction='column' className='w-2/6 grow'>
-      {showName && name && (
+      {visibleSections.length > 1 && name && (
         <Flex gap='1' align='baseline' justify='center'>
           {name}
           {description && (
@@ -51,7 +51,7 @@ export const GameContentDisplay: React.FC<GameContentDisplayProps> = ({
         direction='column'
         className='bg-white overflow-y-scroll w-full p-4 whitespace-pre-wrap grow rounded shadow-md outline outline-gray-300 outline-1'
       >
-        {content}
+        {children}
         <div ref={contentEndRef} />
       </Flex>
     </Flex>
