@@ -26,9 +26,9 @@ def is_parser_error(response):
     return False
 
 
-def add_recent_gamelog_and_visited_rooms_to_llm_prompt(norooms=False):
+def add_recent_gamelog_and_current_room_to_llm_prompt():
     state = get_current_state()
-    current_room, gamelog = get_rooms_and_gamelog()
+    current_room, gamelog = get_current_room_and_gamelog()
     gamelog_text = config["responses"]["gamelog"].replace("{{{gamelog}}}", gamelog)
     concat_current_llm_prompt(gamelog_text)
 
@@ -72,7 +72,7 @@ def try_to_fix_parser_error(command, response):
         # trying alternative commands
         temp_game_state = state.env.get_state()
 
-        add_recent_gamelog_and_visited_rooms_to_llm_prompt()
+        add_recent_gamelog_and_current_room_to_llm_prompt()
         concat_current_llm_prompt(error_response)
         concat_current_llm_prompt(preamble)
         concat_current_llm_prompt(possible_actions)
@@ -127,7 +127,7 @@ def add_to_game_log(output, is_command=False):
     state.game_chatlog.append([is_command, output])
 
 
-def get_rooms_and_gamelog():
+def get_current_room_and_gamelog():
     """
     Get the most recent part of the game playlog as well as
     the CURRENT room (a deviation from original implementation)
