@@ -53,7 +53,7 @@ Open up `llm_serve.py`, and you can change the `MODEL_NAME` to point to another 
 
 ## TODO ##
 - [x] Visually distinguish game response from player commands
-- [ ] Hook up debug log viewing from the web
+- [x] Hook up debug log viewing from the web
 - [ ] Add support for OpenAI models
 
 ## Known Issues ##

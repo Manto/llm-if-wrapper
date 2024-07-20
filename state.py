@@ -14,7 +14,7 @@ class GameState:
         self.env = None  # the jericho Frotz environment
         self.game_path = ""
         self.tone = (
-            None  # One of "original", "pratchett", "gumshoe", "zen", "spaceopera"
+            None  # One of "original", "pratchett", "gumshoe", "legal", "spaceopera"
         )
         self.llm_provider = ""  # Supports "anthropic" or "hosted"
 
