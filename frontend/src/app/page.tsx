@@ -1,10 +1,11 @@
 'use client'
 
-import { useState, useEffect, useRef, ReactNode } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import {
   Dialog,
   Flex,
   Button,
+  Spinner,
   Text,
   Heading,
   Select,
@@ -14,7 +15,6 @@ import {
   TextField
 } from '@radix-ui/themes'
 import { GameContentDisplay } from './gameDisplay'
-import { StopwatchIcon } from '@radix-ui/react-icons'
 
 import { GAMES, TONES, LLMS, API_URL } from './settings'
 
@@ -25,15 +25,15 @@ const App = () => {
   const [isStartGameOpen, setIsStartGameOpen] = useState(false)
   const [isStartingGame, setIsStartingGame] = useState(false)
   const [isProcessingCommand, setIsProcessingCommand] = useState(false)
-  const [showOriginal, setShowOriginal] = useState(true)
-  const [showDebug, setShowDebug] = useState(false)
+  const [visibleSections, setVisibleSections] = useState(['game', 'original'])
   const [gameStateId, setGameStateId] = useState()
   const [command, setCommand] = useState('')
-  const [debug, setDebug] = useState<any[]>([])
+  const [debug, setDebug] = useState<string>()
   const [gameText, setGameText] = useState<any[]>([])
   const [originalText, setOriginalText] = useState<any[]>([])
   const commandInputRef = useRef<null | HTMLInputElement>(null)
   const mounted = useRef(false)
+  const pollLogId = useRef<ReturnType<typeof setInterval>>()
 
   const onMount = async () => {
     // Warm up LLM functions before player begin to start game
@@ -47,6 +47,29 @@ const App = () => {
       onMount()
     }
   }, [])
+
+  useEffect(() => {
+    if (gameStateId) {
+      tailLog()
+    }
+  }, [gameStateId])
+
+  useEffect(() => {
+    if (
+      gameStateId &&
+      isProcessingCommand &&
+      visibleSections.indexOf('debug')
+    ) {
+      pollLogId.current = setInterval(() => {
+        tailLog()
+      }, 5000)
+    } else {
+      clearInterval(pollLogId.current)
+      tailLog()
+    }
+
+    return () => clearInterval(pollLogId.current)
+  }, [isProcessingCommand])
 
   const startGame = async () => {
     setIsStartingGame(true)
@@ -65,12 +88,36 @@ const App = () => {
       })
       const data = await response.json()
       setGameStateId(data['id'])
-      setGameText([...gameText, data['llm_response']])
-      setOriginalText([...originalText, data['game_response']])
+      setGameText([
+        ...gameText,
+        <span key={gameText.length}>{data['llm_response']}</span>
+      ])
+      setOriginalText([
+        ...originalText,
+        <span key={originalText.length}>{data['game_response']}</span>
+      ])
     } finally {
       setIsStartingGame(false)
       setIsStartGameOpen(false)
     }
+  }
+
+  const tailLog = async () => {
+    if (!gameStateId) {
+      return
+    }
+
+    const response = await fetch(`${API_URL}/tail_log`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        game_state_id: gameStateId
+      })
+    })
+    const result = await response.json()
+    setDebug(result.log)
   }
 
   const processCommand = async () => {
@@ -90,13 +137,17 @@ const App = () => {
       const data = await response.json()
       setOriginalText([
         ...originalText,
-        <b>&gt; {data['game_command']}</b>,
-        data['game_response']
+        <span key={originalText.length}>
+          <b>&gt; {data['game_command']}</b>
+        </span>,
+        <span key={originalText.length + 1}>{data['game_response']}</span>
       ])
       setGameText([
         ...gameText,
-        <b>&gt; {data['input_command']}</b>,
-        data['llm_response']
+        <span key={gameText.length}>
+          <b>&gt; {data['input_command']}</b>
+        </span>,
+        <span key={gameText.length + 1}>{data['llm_response']}</span>
       ])
       setCommand('')
     } finally {
@@ -110,9 +161,6 @@ const App = () => {
       processCommand()
     }
   }
-
-  const showGameDisplayNames =
-    [showOriginal, showDebug].filter(x => x).length > 0
 
   return (
     <>
@@ -251,7 +299,15 @@ const App = () => {
                   defaultChecked
                   radius='small'
                   size='1'
-                  onCheckedChange={setShowOriginal}
+                  onCheckedChange={() => {
+                    if (visibleSections.indexOf('original') === -1) {
+                      setVisibleSections([...visibleSections, 'original'])
+                    } else {
+                      setVisibleSections(
+                        visibleSections.filter(s => s !== 'original')
+                      )
+                    }
+                  }}
                 />
               </Flex>
               <Flex gap='2'>
@@ -259,32 +315,45 @@ const App = () => {
                 <Switch
                   radius='small'
                   size='1'
-                  onCheckedChange={setShowDebug}
+                  onCheckedChange={() => {
+                    if (visibleSections.indexOf('debug') === -1) {
+                      setVisibleSections([...visibleSections, 'debug'])
+                    } else {
+                      setVisibleSections(
+                        visibleSections.filter(s => s !== 'debug')
+                      )
+                    }
+                  }}
                 />
               </Flex>
             </Flex>
           </Flex>
           <Flex className='min-w-full max-h-[600px] min-h-[400px] bg-gray-100 screen flex flex-row gap-4 pl-4 pr-4'>
-            {showOriginal && (
+            {visibleSections.indexOf('original') !== -1 && (
               <GameContentDisplay
-                content={originalText}
-                showName={showGameDisplayNames}
+                visibleSections={visibleSections}
                 name='Original Game Text'
                 description='This is how the game content looks as originally designed and written by the creator.'
-              />
+              >
+                <>{originalText}</>
+              </GameContentDisplay>
             )}
-            <GameContentDisplay
-              content={gameText}
-              showName={showGameDisplayNames}
-              name='LLM Wrapped Game Text'
-              description='This is how the game content looks with LLM parsing and rewrite.'
-            />
-            {showDebug && (
+            {visibleSections.indexOf('game') !== -1 && (
               <GameContentDisplay
-                content={debug}
+                visibleSections={visibleSections}
+                name='LLM Wrapped Game Text'
+                description='This is how the game content looks with LLM parsing and rewrite.'
+              >
+                <>{gameText}</>
+              </GameContentDisplay>
+            )}
+            {visibleSections.indexOf('debug') !== -1 && (
+              <GameContentDisplay
                 name='Debug Log'
-                showName={showGameDisplayNames}
-              />
+                visibleSections={visibleSections}
+              >
+                <Code size='1'>{debug}</Code>
+              </GameContentDisplay>
             )}
           </Flex>
           <Box className='bg-white'>
@@ -299,7 +368,7 @@ const App = () => {
               ref={commandInputRef}
             >
               <TextField.Slot>
-                {isProcessingCommand && <StopwatchIcon />}
+                {isProcessingCommand && <Spinner />}
               </TextField.Slot>
             </TextField.Root>
           </Box>

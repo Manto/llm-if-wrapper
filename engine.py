@@ -14,7 +14,7 @@ from game import (
     add_to_game_log,
     try_to_fix_parser_error,
     is_parser_error,
-    add_recent_gamelog_and_visited_rooms_to_llm_prompt,
+    add_recent_gamelog_and_current_room_to_llm_prompt,
 )
 from utils import (
     write_to_debug_log,
@@ -65,7 +65,7 @@ def rewrite_response(command, response):
     concat_current_llm_prompt(config["style"]["length"])
     concat_current_llm_prompt(config["style"]["formatting"])
     concat_current_llm_prompt(config["style"]["caveat"])
-    add_recent_gamelog_and_visited_rooms_to_llm_prompt()
+    add_recent_gamelog_and_current_room_to_llm_prompt()
 
     # We should have tried to fix parser error by this point.
     # If we're at an unfixable error, just make stuff up

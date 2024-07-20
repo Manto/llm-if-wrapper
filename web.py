@@ -1,3 +1,4 @@
+import mmap
 import json
 from pathlib import Path
 
@@ -54,8 +55,12 @@ def web():
         tone = body.get("tone")
 
         new_state = state.init_game_state(
-            game_path, llm_provider, tone, id_in_log_path=True
+            game_path,
+            llm_provider,
+            tone,
+            id_in_log_path=True,
         )
+        new_state.post_debug_log_write = vol.commit
         state.set_current_state(new_state)
 
         input_command, game_command, game_response, llm_response, is_game_over = (
@@ -80,6 +85,7 @@ def web():
         input_command = body["input"]
 
         loaded_state = state.load_state_by_id(game_id)
+        loaded_state.post_debug_log_write = vol.commit
         state.set_current_state(loaded_state)
 
         input_command, game_command, game_response, llm_response, is_game_over = (
@@ -101,6 +107,39 @@ def web():
     def warm_inference(request: Request):
         llm.warm_up.remote_gen()
         return "Done"
+
+    @web_app.post("/tail_log")
+    async def tail_log(request: Request):
+        body = await request.json()
+        game_state_id = body["game_state_id"]
+        # TODO: Add a pagination / scroll back mechanism
+        # Simplest implementation for now to just return last 250 rows of text.
+
+        output = ""
+        filename = f"logs/debug-{game_state_id}.log"
+        vol.reload()  # Needs a reload to get latest file state
+        try:
+            with open(filename, "rb") as f:
+                mm = mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ)
+
+                try:
+                    # Start from the end of the file
+                    current_pos = mm.size() - 1
+                    lines_found = 0
+
+                    # Move backwards until we find N newlines or reach the start
+                    while current_pos >= 0 and lines_found < 250:
+                        if mm[current_pos] == ord("\n"):
+                            lines_found += 1
+                        current_pos -= 1
+
+                    # Read from the position after the Nth newline to the end
+                    return {"log": mm[current_pos + 2 :].decode("utf-8")}
+
+                finally:
+                    mm.close()
+        except FileNotFoundError:
+            return {"log": "<file not found>"}
 
     @web_app.post("/inference")
     async def inference(request: Request):
@@ -126,5 +165,4 @@ def web():
         )
 
     web_app.mount("/", StaticFiles(directory="/assets", html=True))
-    web_app.mount("/logs", StaticFiles(directory="/root/logs"))
     return web_app
