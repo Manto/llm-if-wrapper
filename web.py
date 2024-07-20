@@ -68,7 +68,6 @@ def web():
         )
 
         state.save_state(new_state)
-        new_state.debug_log.close()
 
         return {
             "id": new_state.id,
@@ -94,7 +93,6 @@ def web():
         )
 
         state.save_state(loaded_state)
-        loaded_state.debug_log.close()
 
         return {
             "id": loaded_state.id,

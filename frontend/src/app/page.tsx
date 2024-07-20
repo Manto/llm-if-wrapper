@@ -1,10 +1,11 @@
 'use client'
 
-import { useState, useEffect, useRef, ReactNode } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import {
   Dialog,
   Flex,
   Button,
+  Spinner,
   Text,
   Heading,
   Select,
@@ -14,7 +15,6 @@ import {
   TextField
 } from '@radix-ui/themes'
 import { GameContentDisplay } from './gameDisplay'
-import { StopwatchIcon } from '@radix-ui/react-icons'
 
 import { GAMES, TONES, LLMS, API_URL } from './settings'
 
@@ -24,7 +24,6 @@ const App = () => {
   const [llm, setLlm] = useState(LLMS[0].id)
   const [isStartGameOpen, setIsStartGameOpen] = useState(false)
   const [isStartingGame, setIsStartingGame] = useState(false)
-  const [isTailingLog, setIsTailingLog] = useState(false)
   const [isProcessingCommand, setIsProcessingCommand] = useState(false)
   const [visibleSections, setVisibleSections] = useState(['game', 'original'])
   const [gameStateId, setGameStateId] = useState()
@@ -108,23 +107,17 @@ const App = () => {
       return
     }
 
-    setIsTailingLog(true)
-
-    try {
-      const response = await fetch(`${API_URL}/tail_log`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          game_state_id: gameStateId
-        })
+    const response = await fetch(`${API_URL}/tail_log`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        game_state_id: gameStateId
       })
-      const result = await response.json()
-      setDebug(result.log)
-    } finally {
-      setIsTailingLog(false)
-    }
+    })
+    const result = await response.json()
+    setDebug(result.log)
   }
 
   const processCommand = async () => {
@@ -363,7 +356,6 @@ const App = () => {
               </GameContentDisplay>
             )}
           </Flex>
-          <Button onClick={tailLog}>Reload</Button>
           <Box className='bg-white'>
             <TextField.Root
               value={command}
@@ -376,7 +368,7 @@ const App = () => {
               ref={commandInputRef}
             >
               <TextField.Slot>
-                {isProcessingCommand && <StopwatchIcon />}
+                {isProcessingCommand && <Spinner />}
               </TextField.Slot>
             </TextField.Root>
           </Box>

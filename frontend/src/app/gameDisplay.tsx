@@ -1,7 +1,7 @@
 'use client'
 
-import { ReactNode, useEffect, useRef } from 'react'
-import { Box, Flex, Text, HoverCard, Button } from '@radix-ui/themes'
+import { useEffect, useRef } from 'react'
+import { Flex, Text, HoverCard } from '@radix-ui/themes'
 import { QuestionMarkCircledIcon } from '@radix-ui/react-icons'
 
 type GameContentDisplayProps = {
