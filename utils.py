@@ -19,9 +19,12 @@ def format_with_linebreaks(text: str, width: int) -> str:
 
 def write_to_debug_log(output):
     state = get_current_state()
-    if state.debug_log != None:
+    if state.debug_log:
         state.debug_log.write(output)
         state.debug_log.flush()
+
+        if state.post_debug_log_write:
+            state.post_debug_log_write()
 
 
 def get_llm_response():

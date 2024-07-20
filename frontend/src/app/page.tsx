@@ -56,12 +56,17 @@ const App = () => {
   }, [gameStateId])
 
   useEffect(() => {
-    if (isProcessingCommand && visibleSections.indexOf('debug')) {
+    if (
+      gameStateId &&
+      isProcessingCommand &&
+      visibleSections.indexOf('debug')
+    ) {
       pollLogId.current = setInterval(() => {
         tailLog()
       }, 5000)
     } else {
       clearInterval(pollLogId.current)
+      tailLog()
     }
 
     return () => clearInterval(pollLogId.current)
@@ -99,6 +104,10 @@ const App = () => {
   }
 
   const tailLog = async () => {
+    if (!gameStateId) {
+      return
+    }
+
     setIsTailingLog(true)
 
     try {
@@ -354,6 +363,7 @@ const App = () => {
               </GameContentDisplay>
             )}
           </Flex>
+          <Button onClick={tailLog}>Reload</Button>
           <Box className='bg-white'>
             <TextField.Root
               value={command}

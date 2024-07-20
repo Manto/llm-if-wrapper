@@ -80,7 +80,7 @@ def try_to_fix_parser_error(command, response):
         if len(tries) > 0:
             failed_tries_prompt = "\n".join(tries)
             failed_tries_prompt = config["errors"]["parser_rewrite_tries"].replace(
-                "{{{alternative_commands}}}", x
+                "{{{alternative_commands}}}", failed_tries_prompt
             )
             concat_current_llm_prompt(failed_tries_prompt)
         concat_current_llm_prompt(config["errors"]["parser_suffix"])
