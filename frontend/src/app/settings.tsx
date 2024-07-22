@@ -50,6 +50,7 @@ export const TONES = [
 
 export const LLMS = [
   { id: 'anthropic', label: 'Claude 3.5 Sonnet' },
+  { id: 'openai', label: 'GPT-4o-mini' },
   { id: 'hosted', label: 'Hosted' }
 ]
 

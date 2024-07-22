@@ -1,5 +1,7 @@
 import argparse
 import curses
+from dotenv import load_dotenv
+
 from state import init_game_state, set_current_state
 from splitscreen import SplitScreen
 import engine
@@ -56,9 +58,22 @@ def main(stdscr, game_path, llm="anthropic", tone="pratchett"):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("game_path")
-    parser.add_argument("-l", "--llm", help="LLM provider", default="anthropic")
-    parser.add_argument("-t", "--tone", help="Tone of rewrite", default="pratchett")
+    parser.add_argument(
+        "-l",
+        "--llm",
+        help="LLM provider",
+        choices=["anthropic", "openai", "hosted"],
+        default="anthropic",
+    )
+    parser.add_argument(
+        "-t",
+        "--tone",
+        help="Tone of rewrite",
+        choices=["none", "original", "pratchett", "gumshoe", "legal", "spaceopera"],
+        default="none",
+    )
 
     args = parser.parse_args()
+    load_dotenv()
 
     curses.wrapper(main, args.game_path, args.llm, args.tone)

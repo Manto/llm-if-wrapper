@@ -2,10 +2,12 @@ import io
 import textwrap
 import os
 from anthropic import Anthropic
+from openai import OpenAI
 from state import get_current_state, llm_config, config
 from llm_serve import LLM
 
 ANTHROPIC_MODEL = "claude-3-5-sonnet-20240620"
+OPENAI_MODEL = "gpt-4o-mini"
 
 
 def format_with_linebreaks(text: str, width: int) -> str:
@@ -20,7 +22,7 @@ def format_with_linebreaks(text: str, width: int) -> str:
 def write_to_debug_log(output):
     state = get_current_state()
     if state.debug_path:
-        with open(state.debug_path, "a") as f:
+        with open(state.debug_path, "a+") as f:
             f.write(output)
 
         if state.post_debug_log_write:
@@ -35,10 +37,12 @@ def get_llm_response():
     """
 
     state = get_current_state()
+    write_to_debug_log(f"=== LLM REQUEST ({state.llm_provider}) ===\n")
+    write_to_debug_log(state.llm_prompt + "\n\n")
+
     prompt = {"role": "user", "content": state.llm_prompt}
 
     if state.llm_provider == "anthropic":
-        # make a request with the prompt
         llm_client = Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
 
         resp = llm_client.messages.create(
@@ -48,8 +52,18 @@ def get_llm_response():
             messages=[prompt],
             temperature=llm_config["config"]["temp"],
         )
-        tokens = resp.usage.input_tokens
         response = resp.content[0].text
+    elif state.llm_provider == "openai":
+        llm_client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+
+        completion = llm_client.chat.completions.create(
+            model=OPENAI_MODEL,
+            messages=[
+                {"role": "system", "content": config["init"]["system_prompt"]},
+                prompt,
+            ],
+        )
+        response = completion.choices[0].message.content
     elif state.llm_provider == "hosted":
         llm = LLM()
         response = ""
