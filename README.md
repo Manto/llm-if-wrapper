@@ -58,7 +58,11 @@ To run the game in browser, you need to setup Modal - an easy way to manage serv
 * Install `modal` in your current Python virtual environment (`pip install modal`)
 * Get a Modal token set up in your environment (`modal token new`)
 
-Once you have the account setup, update `frontend/next.config.mjs` and replace `modalUsername` with your own username.
+Once you have the account setup, create the file `frontend/.env.local` with your modal username like the following:
+
+```
+NEXT_PUBLIC_MODAL_USERNAME=<your_account>
+```
 
 ### Start Local Client and Server ###
 
