@@ -54,4 +54,10 @@ export const LLMS = [
   { id: 'hosted', label: 'Hosted' }
 ]
 
-export const API_URL = 'https://manto--llm-text-adv-web-dev.modal.run'
+export const API_URL =
+  `https://` +
+  process.env.NEXT_PUBLIC_MODAL_USERNAME +
+  '--' +
+  process.env.NEXT_PUBLIC_MODAL_PROJECT_NAME +
+  (process.env.NODE_ENV === 'development' ? '-dev' : '') +
+  '.modal.run'
