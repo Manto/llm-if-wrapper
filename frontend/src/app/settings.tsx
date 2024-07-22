@@ -57,7 +57,6 @@ export const LLMS = [
 export const API_URL =
   `https://` +
   process.env.NEXT_PUBLIC_MODAL_USERNAME +
-  '--' +
-  process.env.NEXT_PUBLIC_MODAL_PROJECT_NAME +
+  '--llm-text-adv-web' +
   (process.env.NODE_ENV === 'development' ? '-dev' : '') +
   '.modal.run'
