@@ -49,9 +49,9 @@ def try_to_fix_parser_error(command, response):
 
     # get all the verbs for the game, and all the nouns accessible in the current room
     verbs = [w for w in state.env.get_dictionary() if w.is_verb]
-    verbs = "\n".join([f'"{verb}"' for verb in verbs])
+    verbs = ", ".join([f'"{v.word}"' for v in verbs])
     nouns = [w for w in state.env.get_dictionary() if w.is_noun]
-    nouns = "\n".join([f'"{noun}"' for noun in nouns])
+    nouns = ", ".join([f'"{n.word}"' for n in nouns])
 
     # try several times to get the LLM to make a command that doesn't result in an parser error
     preamble = config["errors"]["parser_preamble"].replace("{{{verbs}}}", verbs)
@@ -84,6 +84,7 @@ def try_to_fix_parser_error(command, response):
             )
             concat_current_llm_prompt(failed_tries_prompt)
         concat_current_llm_prompt(config["errors"]["parser_suffix"])
+
         llm_response = get_llm_response()
 
         # Attempt to parse out the newly suggested command

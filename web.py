@@ -12,6 +12,10 @@ static_path = os.path.join(os.getcwd(), "frontend", "out")
 game_path = os.path.join(os.getcwd(), "games")
 config_path = os.path.join(os.getcwd(), "configs")
 
+web_api_image = modal.Image.debian_slim(python_version="3.11").pip_install(
+    "anthropic", "openai", "jericho"
+)
+
 
 @app.function(
     mounts=[
@@ -24,6 +28,7 @@ config_path = os.path.join(os.getcwd(), "configs")
     secrets=[modal.Secret.from_dotenv()],
     container_idle_timeout=300,
     timeout=600,
+    image=web_api_image,
 )
 @modal.asgi_app()
 def web():

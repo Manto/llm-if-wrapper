@@ -131,10 +131,10 @@ and feeling rather foolish)."
 parser_preamble = '''
 This response is due to a limitation of the game engine and its text parser.  
 
-The game understands the following verbs and prepositions, where all words on the same line are synonyms.
+The game understands the following verbs and prepositions, separated by commas:
 {{{verbs}}}
 
-The game understands the following noun phrases, where all noun phrases on the same line are synonyms.
+The game understands the following noun phrases, separated by commas:
 {{{nouns}}}
 
 '''
@@ -153,10 +153,10 @@ The following commands (one per line) are possibly valid actions that the game m
 '''
 
 parser_suffix = '''
-Rewrite the player's command into one that the game accepts and aligns as closely as possible with the player's intent.
+Rewrite the player's command into a single line of text that the game accepts and aligns with the player's intent.
 
 First, explain why each word of your rewritten command is a good choice.
 
-Then enclose your suggested new command in triple plusses, as follows:
+Then enclose your suggested new command in triple plusses, in a single line of text, as follows:
 +++SUGGESTION+++
 '''

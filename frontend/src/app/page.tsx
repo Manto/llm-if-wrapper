@@ -22,7 +22,7 @@ const App = () => {
   const [game, setGame] = useState(GAMES[0].id)
   const [tone, setTone] = useState(TONES[0].id)
   const [llm, setLlm] = useState(LLMS[0].id)
-  const [isStartGameOpen, setIsStartGameOpen] = useState(false)
+  const [isStartGameOpen, setIsStartGameOpen] = useState(true)
   const [isStartingGame, setIsStartingGame] = useState(false)
   const [isProcessingCommand, setIsProcessingCommand] = useState(false)
   const [visibleSections, setVisibleSections] = useState(['game', 'original'])
@@ -166,16 +166,12 @@ const App = () => {
     <>
       {!gameStateId && (
         <div className='min-w-full min-h-screen bg-gray-100 screen flex flex-col gap-6 justify-center items-center'>
-          <Heading>LLM-IF-Wrapper</Heading>
-          <Button onClick={() => setIsStartGameOpen(true)} size='4'>
-            Start Game
-          </Button>
-
           <Dialog.Root open={isStartGameOpen}>
             <Dialog.Content maxWidth='450px'>
               <Dialog.Title>Start Game</Dialog.Title>
               <Dialog.Description size='2' mb='4'>
-                Select a game and a rewrite tone for the story.
+                Select a classic interactive fiction game and an optional
+                rewrite tone below.
               </Dialog.Description>
 
               <Flex direction='column' gap='3'>
@@ -251,19 +247,22 @@ const App = () => {
                       </Text>
                     </Box>
                   )}
+                  {llm === 'openai' && (
+                    <Box>
+                      <Text size='1'>
+                        Make sure you provided a valid{' '}
+                        <Code>OPENAI_API_KEY</Code>
+                        in <Code>.env</Code> file for your deployed Modal
+                        endpoint.
+                      </Text>
+                    </Box>
+                  )}
                 </label>
               </Flex>
 
               <Flex gap='3' mt='4' justify='end'>
-                <Button
-                  onClick={() => setIsStartGameOpen(false)}
-                  variant='soft'
-                  color='gray'
-                >
-                  Cancel
-                </Button>
                 <Button loading={isStartingGame} onClick={startGame}>
-                  Start
+                  Start Game
                 </Button>
               </Flex>
             </Dialog.Content>

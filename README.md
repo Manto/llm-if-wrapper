@@ -12,13 +12,34 @@ Enter LLMs. What if we can leverage them to repair unrecognized commands, improv
 
 You can run the example locally with an Anthropic API key. Alternatively, you can deploy the project using [Modal](https://modal.com/) (they offer $30 worth of hosting credit for free each month) to play it from the web, using a LLM of your choice.
 
-## Running Locally
+## Setting up your Anthropic/OpenAI API Key
 
-To run the game `9:05` locally in Anthropic:
+To use Anthropic or OpenAI models for the project, you need to specify your keys. To do so, create a `.env` file in the project directory, and then enter your API keys:
 
 ```
-export ANTHROPIC_API_KEY=sk-...
-python local.py games/905.z5
+ANTHROPIC_API_KEY=sk-...
+OPENAI_API_KEY=sk-proj...
+```
+
+### Changing the Anthropic/OpenAI Model ###
+
+By default, the project uses Claude 3.5 Sonnet on Anthropic, and gpt-4o-mini on OpenAI.
+
+You can change the model to use by modifying `ANTHROPIC_MODEL` and `OPENAI_MODEL` in `utils.py`.
+
+
+## Running Locally
+
+To run the game `9:05` locally with Anthropic (defaults to Claude 3.5 Sonnet):
+
+```
+python local.py games/905.z5 --llm anthropic
+```
+
+If you want to use an OpenAI model (defaults to gpt-4o-mini):
+
+```
+python local.py games/905.z5 --llm openai
 ```
 
 ## Deploy and Play from Browser
@@ -39,22 +60,15 @@ cd ..
 modal deploy web
 ```
 
-If you want to use Anthropic model when running in the web, enter your API key in a `.env` file like so:
 
-```
-ANTHROPIC_API_KEY=sk-...
-```
-
-Then deploy as usual.
-
-### Changing the Model ###
+### Changing the Hosted Model ###
 
 Open up `llm_serve.py`, and you can change the `MODEL_NAME` to point to another model available on HuggingFace that is supported by vLLM. Be sure to `modal deploy web` again after making the change, and Modal will rebuild the image and deploy accordingly.
 
 ## TODO ##
 - [x] Visually distinguish game response from player commands
 - [x] Hook up debug log viewing from the web
-- [ ] Add support for OpenAI models
+- [x] Add support for OpenAI models
 
 ## Known Issues ##
 * The rewrite sometimes make up unrelated content or completely lose the structure of original game text, especially when using less capable models.
