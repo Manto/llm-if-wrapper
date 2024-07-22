@@ -40,6 +40,7 @@ If you want to use an OpenAI model (defaults to gpt-4o-mini):
 
 ```
 python local.py games/905.z5 --llm openai
+```
 
 You can also supply a tone to perform an optional rewrite on the game text. You can choose one of these following tones: `pratchett`, `gumshoe`, `legal`, `spaceopera`, `original`. For example:
 
