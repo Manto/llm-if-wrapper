@@ -40,18 +40,50 @@ If you want to use an OpenAI model (defaults to gpt-4o-mini):
 
 ```
 python local.py games/905.z5 --llm openai
+
+You can also supply a tone to perform an optional rewrite on the game text. You can choose one of these following tones: `pratchett`, `gumshoe`, `legal`, `spaceopera`, `original`. For example:
+
+```
+python local.py games/905.z5 --llm anthropic --tone gumshoe
 ```
 
-## Deploy and Play from Browser
+Leaving out tone will disable rewrite of game text and only perform rewrite on player's command when getting parser errors.
 
-You can deploy this project to Modal to try this out with a web based UI and an open source LLM of your choice. 
+## Running Locally from Browser
 
-### Requirements ### 
-* modal installed in your current Python virtual environment (`pip install modal`)
-* A [Modal](http://modal.com/) account
-* A Modal token set up in your environment (`modal token new`)
+To run the game in browser, you need to setup Modal - an easy way to manage serverless deployment with optional GPU support.
 
-once you have the requirement setup, it will deploy the project to Modal, with a hosted frontend and an LLM inference endpoint. The deployed model is `Meta-Llama-3-8B-Instruct` by default, but you can change it.
+### Configuring Modal ### 
+* Get a [Modal](http://modal.com/) account
+* Install `modal` in your current Python virtual environment (`pip install modal`)
+* Get a Modal token set up in your environment (`modal token new`)
+
+Once you have the account setup, create the file `frontend/.env.local` with your modal username like the following:
+
+```
+NEXT_PUBLIC_MODAL_USERNAME=<your_account>
+```
+
+### Start Local Client and Server ###
+
+The server contains the logic to interface with the IF interpreter and making calls to LLM to perform the parsing check and rewrites. It also can serve an open source model (`Meta-Llama-3-8B-Instruct` by default) as an option instead of using Anthropic or OpenAI API. To start the server, run the following:
+
+```
+modal serve web
+```
+
+The client uses `next.js`, and to start it, run the following:
+
+```
+cd frontend
+npm run dev
+```
+
+When both the client and server are ready, navigate to `http://localhost:3000` in your browser to run the project.
+
+### Deploying Modal ###
+
+To deploy the project so you can access it from anywhere, do a build on the frontend project and then deploy everything via modal with the following command:
 
 ```
 cd frontend
@@ -60,6 +92,18 @@ cd ..
 modal deploy web
 ```
 
+The output will look something like the following:
+
+```
+...
+├── 🔨 Created function download_model_to_image.
+├── 🔨 Created function LLM.*.
+├── 🔨 Created function LLM.warm_up.
+├── 🔨 Created function LLM.completion_stream.
+└── 🔨 Created web function web => https://xyz--llm-text-adv-web.modal.run
+```
+
+Then navigate to `https://xyz--llm-text-adv-web.modal.run` in your browser to access the project.
 
 ### Changing the Hosted Model ###
 
