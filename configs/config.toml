@@ -71,13 +71,18 @@ gamelog_count = 10
 
 gamelog = '''
 The recent game progression has been as follows:
+
+<game_log>
 {{{gamelog}}}
+</game_log>
 '''
 
 current_room = '''
 The player is currently in a location described as follows:
 
+<current_location>
 {{{current_room}}}
+</current_location>
 '''
 
 suffix = '''
@@ -86,37 +91,33 @@ Return only your response without any preface or introduction.
 '''
 
 generic = '''
-The player has just entered the following command, delimited by triple plusses,
-+++
+The player has just entered the following command:
+<player_command>
 {{{command}}} 
-+++
+</player_command>
 
 The game engine has responded with the following:
+<response>
 {{{response}}}
+</response>
 '''
 
 [errors]
 retries = 5 # try up to five times to fix parser errors
 
-prefixes = [
-    #zork1
-    "[!: Verb error",
-    "[!: Noun error",
-    "I don't know the word",
-    "That sentence isn't one I recognize",
-    "You used the word",
-    "There was no verb in that sentence",
-    "There were too many nouns",
-    #wishbringer
-    "(Sorry, but the word",
-    "(Sorry, but this story doesn't recognize the word",
-    "(This story doesn't know the word",
-    "(You don't need to use the word",
-    "(You don't need to refer to",
-    "(That sentence didn't make sense.",
-    #starcross
-    "I can't find a verb in that sentence"
-]
+prompt = '''
+In the context of an interactive fiction game, if player entered this command:
+<command>
+{{{command}}}
+</command>
+
+and game responded with:
+<response>
+{{{response}}}
+</response>
+
+Is the response a parser error? Reply with only a single word "yes" or "no".
+'''
 
 generic = '''
 This response is due to a limitation of the game engine and its text parser.  
@@ -141,15 +142,17 @@ The game understands the following noun phrases, separated by commas:
 
 parser_rewrite_tries = '''
 The following alternative commands (one per line) are NOT accepted by the game:
+<rejected_commands>
 {{{alternative_commands}}}
+</rejected_commands>
 
 '''
 
 parser_rewrite_possible_actions = '''
 The following commands (one per line) are possibly valid actions that the game may accept:
-
+<possible_actions>
 {{{possible_actions}}}
-
+</possible_actions>
 '''
 
 parser_suffix = '''
