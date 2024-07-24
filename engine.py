@@ -19,7 +19,7 @@ from game import (
 from utils import (
     write_to_debug_log,
     concat_current_llm_prompt,
-    get_llm_response,
+    get_llm_response_for_current_prompt,
 )
 from state import (
     config,
@@ -42,7 +42,7 @@ def init_rewrites(game_init_text):
         game_init_text = game_init_text[:-1]
         game_init_text = game_init_text.rstrip()
     concat_current_llm_prompt(game_init_text)
-    return get_llm_response()
+    return get_llm_response_for_current_prompt()
 
 
 def rewrite_response(command, response):
@@ -69,7 +69,7 @@ def rewrite_response(command, response):
 
     # We should have tried to fix parser error by this point.
     # If we're at an unfixable error, just make stuff up
-    if is_parser_error(response):
+    if is_parser_error(command, response):
         concat_current_llm_prompt(config["errors"]["generic"])
 
     # Perform LLM rewrite.
@@ -79,7 +79,7 @@ def rewrite_response(command, response):
     )
     concat_current_llm_prompt(prompt)
     concat_current_llm_prompt(config["responses"]["suffix"])
-    llm_response = get_llm_response()
+    llm_response = get_llm_response_for_current_prompt()
 
     if input == True:
         llm_response = llm_response + "\n\n>"
@@ -112,7 +112,7 @@ def process_input(input_command):
     write_to_debug_log(f"=== Game Response ===\n{game_response}\n\n")
 
     # If we detected parse error, try LLM rewrite
-    if is_parser_error(game_response):
+    if is_parser_error(input_command, game_response):
         write_to_debug_log("UNRECOGNIZED COMMAND: " + input_command + "\n\n")
 
         # First, we roll back to the state before error, just in case

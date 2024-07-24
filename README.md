@@ -114,6 +114,7 @@ Open up `llm_serve.py`, and you can change the `MODEL_NAME` to point to another 
 - [x] Visually distinguish game response from player commands
 - [x] Hook up debug log viewing from the web
 - [x] Add support for OpenAI models
+- [x] Moved detection of parser error to LLM, instead of simplistic string matching.
 
 ## Known Issues ##
 * The rewrite sometimes make up unrelated content or completely lose the structure of original game text, especially when using less capable models.

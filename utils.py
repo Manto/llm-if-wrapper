@@ -29,25 +29,34 @@ def write_to_debug_log(output):
             state.post_debug_log_write()
 
 
-def get_llm_response():
+def get_llm_response_for_current_prompt():
     """
     Sends out the current LLM prompt being built then return response
 
     TODO: Do we want to send previous game log for more consistency?
     """
+    state = get_current_state()
+    response = make_llm_inference(config["init"]["system_prompt"], state.llm_prompt)
+    # reset the current LLM prompt
+    state.llm_prompt = ""
+
+    return response
+
+
+def make_llm_inference(system_prompt, user_prompt):
 
     state = get_current_state()
     write_to_debug_log(f"=== LLM REQUEST ({state.llm_provider}) ===\n")
-    write_to_debug_log(state.llm_prompt + "\n\n")
+    write_to_debug_log(user_prompt + "\n\n")
 
-    prompt = {"role": "user", "content": state.llm_prompt}
+    prompt = {"role": "user", "content": user_prompt}
 
     if state.llm_provider == "anthropic":
         llm_client = Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
 
         resp = llm_client.messages.create(
             model=ANTHROPIC_MODEL,
-            system=config["init"]["system_prompt"],
+            system=system_prompt,
             max_tokens=llm_config["config"]["max_tokens"],
             messages=[prompt],
             temperature=llm_config["config"]["temp"],
@@ -59,7 +68,7 @@ def get_llm_response():
         completion = llm_client.chat.completions.create(
             model=OPENAI_MODEL,
             messages=[
-                {"role": "system", "content": config["init"]["system_prompt"]},
+                {"role": "system", "content": system_prompt},
                 prompt,
             ],
         )
@@ -68,7 +77,7 @@ def get_llm_response():
         llm = LLM()
         response = ""
         for segment in llm.completion_stream.remote_gen(
-            [{"role": "system", "content": config["init"]["system_prompt"]}, prompt],
+            [{"role": "system", "content": system_prompt}, prompt],
             temp=llm_config["config"]["temp"],
             max_tokens=llm_config["config"]["max_tokens"],
         ):
@@ -79,10 +88,6 @@ def get_llm_response():
     write_to_debug_log(f"=== LLM RESPONSE ({state.llm_provider}) ===\n")
     write_to_debug_log(response + "\n\n")
 
-    message = {"role": "assistant", "content": response}
-
-    # reset the current LLM prompt
-    state.llm_prompt = ""
     return response
 
 

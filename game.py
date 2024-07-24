@@ -6,11 +6,12 @@ from state import get_current_state, config
 from utils import (
     write_to_debug_log,
     concat_current_llm_prompt,
-    get_llm_response,
+    make_llm_inference,
+    get_llm_response_for_current_prompt,
 )
 
 
-def is_parser_error(response):
+def is_parser_error(command, response):
     """
     Check if the response is a parser error
     Returns True if it is, False otherwise
@@ -19,10 +20,16 @@ def is_parser_error(response):
     if not jericho.util.recognized(response):
         return True
 
-    # Then use the list of regex provided by config
-    for prefix in config["errors"]["prefixes"]:
-        if response.startswith(prefix):
-            return True
+    # Then we use LLM for this
+    result = make_llm_inference(
+        "You are helping a person play an interactive fiction and understand game commands.",
+        config["errors"]["prompt"]
+        .replace("{{{command}}}", command)
+        .replace("{{{response}}}", response),
+    )
+    if result.lower().startswith("yes"):
+        return True
+
     return False
 
 
@@ -85,7 +92,7 @@ def try_to_fix_parser_error(command, response):
             concat_current_llm_prompt(failed_tries_prompt)
         concat_current_llm_prompt(config["errors"]["parser_suffix"])
 
-        llm_response = get_llm_response()
+        llm_response = get_llm_response_for_current_prompt()
 
         # Attempt to parse out the newly suggested command
         # If we can't find a suggested command, we give up and return original
@@ -102,7 +109,7 @@ def try_to_fix_parser_error(command, response):
         state.env.set_state(temp_game_state)
 
         # Once we get a good command, use that to resume the game loop
-        if not is_parser_error(new_response):
+        if not is_parser_error(new_command, new_response):
             command = new_command
             break
 
