@@ -67,6 +67,8 @@ def make_llm_inference(system_prompt, user_prompt):
 
         completion = llm_client.chat.completions.create(
             model=OPENAI_MODEL,
+            temperature=llm_config["config"]["temp"],
+            max_tokens=llm_config["config"]["max_tokens"],
             messages=[
                 {"role": "system", "content": system_prompt},
                 prompt,
