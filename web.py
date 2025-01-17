@@ -12,19 +12,17 @@ static_path = os.path.join(os.getcwd(), "frontend", "out")
 game_path = os.path.join(os.getcwd(), "games")
 config_path = os.path.join(os.getcwd(), "configs")
 
-web_api_image = modal.Image.debian_slim(python_version="3.11").pip_install(
-    "anthropic", "openai", "jericho"
+web_api_image = (
+    modal.Image.debian_slim(python_version="3.11")
+    .pip_install("anthropic", "openai", "jericho")
+    .add_local_dir(static_path, remote_path="/assets")
+    .add_local_dir(config_path, remote_path="/root/configs")
+    .add_local_dir(game_path, remote_path="/root/games")
 )
 
 
 @app.function(
-    mounts=[
-        modal.Mount.from_local_dir(static_path, remote_path="/assets"),
-        modal.Mount.from_local_dir(config_path, remote_path="/root/configs"),
-        modal.Mount.from_local_dir(game_path, remote_path="/root/games"),
-    ],
     volumes={"/root/logs": vol},
-    _allow_background_volume_commits=True,
     secrets=[modal.Secret.from_dotenv()],
     container_idle_timeout=300,
     timeout=600,
