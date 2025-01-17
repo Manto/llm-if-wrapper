@@ -21,12 +21,11 @@ ANTHROPIC_API_KEY=sk-...
 OPENAI_API_KEY=sk-proj...
 ```
 
-### Changing the Anthropic/OpenAI Model ###
+### Changing the Anthropic/OpenAI Model
 
 By default, the project uses Claude 3.5 Sonnet on Anthropic, and gpt-4o-mini on OpenAI.
 
 You can change the model to use by modifying `ANTHROPIC_MODEL` and `OPENAI_MODEL` in `utils.py`.
-
 
 ## Running Locally
 
@@ -54,10 +53,11 @@ Leaving out tone will disable rewrite of game text and only perform rewrite on p
 
 To run the game in browser, you need to setup Modal - an easy way to manage serverless deployment with optional GPU support.
 
-### Configuring Modal ### 
-* Get a [Modal](http://modal.com/) account
-* Install `modal` in your current Python virtual environment (`pip install modal`)
-* Get a Modal token set up in your environment (`modal token new`)
+### Configuring Modal
+
+- Get a [Modal](http://modal.com/) account
+- Install `modal` in your current Python virtual environment (`pip install modal`)
+- Get a Modal token set up in your environment (`modal token new`)
 
 Once you have the account setup, create the file `frontend/.env.local` with your modal username like the following:
 
@@ -65,7 +65,7 @@ Once you have the account setup, create the file `frontend/.env.local` with your
 NEXT_PUBLIC_MODAL_USERNAME=<your_account>
 ```
 
-### Start Local Client and Server ###
+### Start Local Client and Server
 
 The server contains the logic to interface with the IF interpreter and making calls to LLM to perform the parsing check and rewrites. It also can serve an open source model (`Meta-Llama-3-8B-Instruct` by default) as an option instead of using Anthropic or OpenAI API. To start the server, run the following:
 
@@ -77,12 +77,13 @@ The client uses `next.js`, and to start it, run the following:
 
 ```
 cd frontend
+npm install # if you have not installed the packages
 npm run dev
 ```
 
 When both the client and server are ready, navigate to `http://localhost:3000` in your browser to run the project.
 
-### Deploying Modal ###
+### Deploying Modal
 
 To deploy the project so you can access it from anywhere, do a build on the frontend project and then deploy everything via modal with the following command:
 
@@ -106,21 +107,24 @@ The output will look something like the following:
 
 Then navigate to `https://xyz--llm-text-adv-web.modal.run` in your browser to access the project.
 
-### Changing the Hosted Model ###
+### Changing the Hosted Model
 
 Open up `llm_serve.py`, and you can change the `MODEL_NAME` to point to another model available on HuggingFace that is supported by vLLM. Be sure to `modal deploy web` again after making the change, and Modal will rebuild the image and deploy accordingly.
 
-## TODO ##
+## TODO
+
 - [x] Visually distinguish game response from player commands
 - [x] Hook up debug log viewing from the web
 - [x] Add support for OpenAI models
 - [x] Moved detection of parser error to LLM, instead of simplistic string matching.
 
-## Known Issues ##
-* The rewrite sometimes make up unrelated content or completely lose the structure of original game text, especially when using less capable models.
-* Certain console based display (e.g., the help menu in Lost Pig) will not display correctly.
+## Known Issues
 
-## Other Ideas ##
-* Instead of string match to detect parser error, fine-tune an LLM for this.
-* Could fork [Parchment](https://github.com/curiousdannii/parchment) for a fully browser based experience, skipping the need for a backend.
-* Generate images via Stable Diffusion along with room descriptions.
+- The rewrite sometimes make up unrelated content or completely lose the structure of original game text, especially when using less capable models.
+- Certain console based display (e.g., the help menu in Lost Pig) will not display correctly.
+
+## Other Ideas
+
+- Instead of string match to detect parser error, fine-tune an LLM for this.
+- Could fork [Parchment](https://github.com/curiousdannii/parchment) for a fully browser based experience, skipping the need for a backend.
+- Generate images via Stable Diffusion along with room descriptions.
