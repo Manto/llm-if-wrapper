@@ -15,7 +15,7 @@ config_path = os.path.join(os.getcwd(), "configs")
 web_api_image = (
     modal.Image.debian_slim(python_version="3.11")
     .pip_install("anthropic", "openai", "jericho")
-    .add_local_dir(static_path, remote_path="/assets")
+    .add_local_dir(static_path, remote_path="/root/assets")
     .add_local_dir(config_path, remote_path="/root/configs")
     .add_local_dir(game_path, remote_path="/root/games")
 )
@@ -43,7 +43,7 @@ def web():
         CORSMiddleware,
         allow_origins=["*"],
         allow_credentials=True,
-        allow_methods=["POST", "GET"],
+        allow_methods=["POST", "GET", "OPTIONS"],
         allow_headers=["*"],
         max_age=3600,
     )
@@ -167,5 +167,5 @@ def web():
             media_type="text/event-stream",
         )
 
-    web_app.mount("/", StaticFiles(directory="/assets", html=True))
+    web_app.mount("/", StaticFiles(directory="assets", html=True), name="static")
     return web_app
