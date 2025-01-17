@@ -6,7 +6,7 @@ from openai import OpenAI
 from state import get_current_state, llm_config, config
 from llm_serve import LLM
 
-ANTHROPIC_MODEL = "claude-3-5-sonnet-20240620"
+ANTHROPIC_MODEL = "claude-3-5-sonnet-20241022"
 OPENAI_MODEL = "gpt-4o-mini"
 
 
