@@ -14,9 +14,10 @@ You can run the example locally with an Anthropic API key. Alternatively, you ca
 
 ## Setting up your Anthropic/OpenAI API Key
 
-To use Anthropic or OpenAI models for the project, you need to specify your keys. To do so, create a `.env` file in the project directory, and then enter your API keys:
+To use Together.ai, Anthropic, or OpenAI models for the project, you need to specify your keys. To do so, create a `.env` file in the project directory, and then enter your API keys:
 
 ```
+TOGETHER_API_KEY=...
 ANTHROPIC_API_KEY=sk-...
 OPENAI_API_KEY=sk-proj...
 ```
@@ -102,10 +103,10 @@ The output will look something like the following:
 ├── 🔨 Created function LLM.*.
 ├── 🔨 Created function LLM.warm_up.
 ├── 🔨 Created function LLM.completion_stream.
-└── 🔨 Created web function web => https://xyz--llm-text-adv-web.modal.run
+└── 🔨 Created web function web => https://xyz--llm-if-wrapper-web.modal.run
 ```
 
-Then navigate to `https://xyz--llm-text-adv-web.modal.run` in your browser to access the project.
+Then navigate to `https://xyz--llm-if-wrapper-web.modal.run` in your browser to access the project.
 
 ### Changing the Hosted Model
 

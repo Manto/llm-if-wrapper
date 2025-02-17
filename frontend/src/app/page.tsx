@@ -25,7 +25,7 @@ const App = () => {
   const [isStartGameOpen, setIsStartGameOpen] = useState(true)
   const [isStartingGame, setIsStartingGame] = useState(false)
   const [isProcessingCommand, setIsProcessingCommand] = useState(false)
-  const [visibleSections, setVisibleSections] = useState(['game', 'original'])
+  const [visibleSections, setVisibleSections] = useState(['game', 'original', 'debug'])
   const [gameStateId, setGameStateId] = useState()
   const [command, setCommand] = useState('')
   const [debug, setDebug] = useState<string>()
@@ -237,6 +237,16 @@ const App = () => {
                       </Select.Group>
                     </Select.Content>
                   </Select.Root>
+                  {llm === 'together' && (
+                    <Box>
+                      <Text size='1'>
+                        Make sure you provided a valid{' '}
+                        <Code>TOGETHER_API_KEY</Code>
+                        in <Code>.env</Code> file for your deployed Modal
+                        endpoint.
+                      </Text>
+                    </Box>
+                  )}
                   {llm === 'anthropic' && (
                     <Box>
                       <Text size='1'>

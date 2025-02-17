@@ -49,6 +49,7 @@ export const TONES = [
 ];
 
 export const LLMS = [
+  { id: "together", label: "Llama 3.3 70B on Together.ai" },
   { id: "anthropic", label: "Claude 3.5 Sonnet" },
   { id: "openai", label: "GPT-4o-mini" },
   { id: "hosted", label: "Hosted" },
@@ -57,6 +58,6 @@ export const LLMS = [
 export const API_URL =
   `https://` +
   process.env.NEXT_PUBLIC_MODAL_USERNAME +
-  "--llm-text-adv-web" +
+  "--llm-if-wrapper-web" +
   (process.env.NODE_ENV === "development" ? "-dev" : "") +
   ".modal.run";

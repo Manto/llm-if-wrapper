@@ -6,7 +6,7 @@ from common import app
 
 MODEL_NAME = "NousResearch/Meta-Llama-3-8B-Instruct"
 MODEL_DIR = "/root/model/model_input"
-GPU_CONFIG = modal.gpu.L4()  # See https://modal.com/docs/guide/gpu
+GPU_CONFIG = "L4"
 
 
 def download_model_to_image(model_dir, model_name):
@@ -43,6 +43,7 @@ llm_image = (
             "model_name": MODEL_NAME,
         },
     )
+    .add_local_python_source("common", "web")
 )
 
 with llm_image.imports():
@@ -64,7 +65,7 @@ class LLM:
 
         engine_args = AsyncEngineArgs(
             model=MODEL_DIR,
-            tensor_parallel_size=GPU_CONFIG.count,
+            tensor_parallel_size=1,
             gpu_memory_utilization=0.90,
             enforce_eager=False,  # capture the graph for faster inference, but slower cold starts
             disable_log_stats=True,  # disable logging so we can stream tokens
@@ -125,10 +126,12 @@ class LLM:
 
     @modal.exit()
     def stop_engine(self):
-        if GPU_CONFIG.count > 1:
-            import ray
+        # If there's more than one GPU, then:
+        #
+        # import ray
+        # ray.shutdown()
 
-            ray.shutdown()
+        pass
 
 
 # For local testing, run `modal run -q llm_serve --input "Where is zork?"`

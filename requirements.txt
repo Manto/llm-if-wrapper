@@ -1,4 +1,7 @@
 anthropic
 jericho
+modal
 openai
 python-dotenv
+together
+toml

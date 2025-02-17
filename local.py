@@ -62,7 +62,7 @@ if __name__ == "__main__":
         "-l",
         "--llm",
         help="LLM provider",
-        choices=["anthropic", "openai", "hosted"],
+        choices=["together", "anthropic", "openai", "hosted"],
         default="anthropic",
     )
     parser.add_argument(

@@ -68,7 +68,7 @@ def save_state(state):
     Used by Modal web endpoint to persist game state in between requests.
     """
     state_dict = modal.Dict.from_name(
-        f"llm-text-adv-{state.id}", create_if_missing=True
+        f"llm-if-wrapper-{state.id}", create_if_missing=True
     )
 
     state_dict["id"] = state.id
@@ -84,7 +84,7 @@ def load_state_by_id(id):
     """
     Used by Modal web endpoint to restore existing game state in between requests.
     """
-    state_dict = modal.Dict.from_name(f"llm-text-adv-{id}", create_if_missing=False)
+    state_dict = modal.Dict.from_name(f"llm-if-wrapper-{id}", create_if_missing=False)
     if not state_dict:
         raise Exception(f"Unable to load state for {id}")
 

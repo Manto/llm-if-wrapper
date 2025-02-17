@@ -1,14 +1,16 @@
 import io
 import textwrap
 import os
+from together import Together
 from anthropic import Anthropic
 from openai import OpenAI
+
 from state import get_current_state, llm_config, config
 from llm_serve import LLM
 
 ANTHROPIC_MODEL = "claude-3-5-sonnet-20241022"
 OPENAI_MODEL = "gpt-4o-mini"
-
+TOGETHER_MODEL = "meta-llama/Llama-3.3-70B-Instruct-Turbo-Free"
 
 def format_with_linebreaks(text: str, width: int) -> str:
     lines = []
@@ -51,7 +53,18 @@ def make_llm_inference(system_prompt, user_prompt):
 
     prompt = {"role": "user", "content": user_prompt}
 
-    if state.llm_provider == "anthropic":
+    if state.llm_provider == "together":
+        client = Together(api_key=os.environ.get("TOGETHER_API_KEY"))
+
+        resp = client.chat.completions.create(
+            model=TOGETHER_MODEL,
+            messages=[prompt],
+            max_tokens=llm_config["config"]["max_tokens"],
+            temperature=llm_config["config"]["temp"],
+        )
+        response = resp.choices[0].message.content
+
+    elif state.llm_provider == "anthropic":
         llm_client = Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
 
         resp = llm_client.messages.create(

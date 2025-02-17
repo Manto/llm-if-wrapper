@@ -14,10 +14,11 @@ config_path = os.path.join(os.getcwd(), "configs")
 
 web_api_image = (
     modal.Image.debian_slim(python_version="3.11")
-    .pip_install("anthropic", "openai", "jericho")
+    .pip_install("anthropic", "openai", "jericho", "together==1.4.1", "pydantic", "fastapi")
     .add_local_dir(static_path, remote_path="/root/assets")
     .add_local_dir(config_path, remote_path="/root/configs")
     .add_local_dir(game_path, remote_path="/root/games")
+    .add_local_python_source("common", "engine", "game", "llm_serve", "splitscreen", "state", "utils")
 )
 
 
