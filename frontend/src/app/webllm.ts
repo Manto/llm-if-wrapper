@@ -43,11 +43,20 @@ export class WebLLMClient {
       { role: "user", content: userPrompt },
     ];
 
+    console.log("=== WebLLM Request ===");
+    console.log("System Prompt:", systemPrompt);
+    console.log("User Prompt:", userPrompt);
+
     const reply = await this.engine.chat.completions.create({
       messages,
     });
 
-    return reply.choices[0].message.content || "";
+    const response = reply.choices[0].message.content || "";
+    console.log("=== WebLLM Response ===");
+    console.log(response);
+    console.log("======================");
+
+    return response;
   }
 
   isReady(): boolean {

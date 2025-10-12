@@ -36,12 +36,13 @@ def init_rewrites(game_init_text):
     concat_current_llm_prompt(config["style"]["length"])
     concat_current_llm_prompt(config["style"]["formatting"])
     concat_current_llm_prompt(config["style"]["caveat"])
-    concat_current_llm_prompt(config["init"]["startup"])
 
     if game_init_text[-1] == ">":  # remove input prompt, if there
         game_init_text = game_init_text[:-1]
         game_init_text = game_init_text.rstrip()
-    concat_current_llm_prompt(game_init_text)
+
+    startup_prompt = config["init"]["startup"].replace("{{{startup_text}}}", game_init_text)
+    concat_current_llm_prompt(startup_prompt)
     return get_llm_response_for_current_prompt()
 
 

@@ -49,10 +49,10 @@ export const TONES = [
 ];
 
 export const LLMS = [
-  { id: "webllm", label: "WebLLM (Llama 3.2 3B - Browser Only)" },
   { id: "together", label: "Llama 3.3 70B on Together.ai" },
   { id: "anthropic", label: "Claude 4.5 Sonnet" },
   { id: "openai", label: "GPT-5 Nano" },
+  { id: "webllm", label: "WebLLM (Llama 3.2 3B - Browser Only)" },
   { id: "hosted", label: "Hosted" },
 ];
 

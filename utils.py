@@ -104,7 +104,7 @@ def make_llm_inference(system_prompt, user_prompt):
     elif state.llm_provider == "webllm":
         # WebLLM inference is handled client-side in the browser
         # Return empty response and let the frontend handle it
-        response = ""
+        response = "[Check browser console for response]"
     else:
         raise Exception(f"Unsupported LLM provider: {state.llm_provider}")
 
