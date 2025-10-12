@@ -112,13 +112,6 @@ Then navigate to `https://xyz--llm-if-wrapper-web.modal.run` in your browser to 
 
 Open up `llm_serve.py`, and you can change the `MODEL_NAME` to point to another model available on HuggingFace that is supported by vLLM. Be sure to `modal deploy web` again after making the change, and Modal will rebuild the image and deploy accordingly.
 
-## TODO
-
-- [x] Visually distinguish game response from player commands
-- [x] Hook up debug log viewing from the web
-- [x] Add support for OpenAI models
-- [x] Moved detection of parser error to LLM, instead of simplistic string matching.
-
 ## Known Issues
 
 - The rewrite sometimes make up unrelated content or completely lose the structure of original game text, especially when using less capable models.
@@ -126,6 +119,5 @@ Open up `llm_serve.py`, and you can change the `MODEL_NAME` to point to another 
 
 ## Other Ideas
 
-- Instead of string match to detect parser error, fine-tune an LLM for this.
 - Could fork [Parchment](https://github.com/curiousdannii/parchment) for a fully browser based experience, skipping the need for a backend.
 - Generate images via Stable Diffusion along with room descriptions.
