@@ -101,6 +101,10 @@ def make_llm_inference(system_prompt, user_prompt):
             max_tokens=llm_config["config"]["max_tokens"],
         ):
             response += segment
+    elif state.llm_provider == "webllm":
+        # WebLLM inference is handled client-side in the browser
+        # Return empty response and let the frontend handle it
+        response = ""
     else:
         raise Exception(f"Unsupported LLM provider: {state.llm_provider}")
 
