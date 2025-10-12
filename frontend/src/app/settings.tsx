@@ -50,8 +50,8 @@ export const TONES = [
 
 export const LLMS = [
   { id: "together", label: "Llama 3.3 70B on Together.ai" },
-  { id: "anthropic", label: "Claude 3.5 Sonnet" },
-  { id: "openai", label: "GPT-4o-mini" },
+  { id: "anthropic", label: "Claude 4.5 Sonnet" },
+  { id: "openai", label: "GPT-5 Nano" },
   { id: "hosted", label: "Hosted" },
 ];
 

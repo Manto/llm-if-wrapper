@@ -14,7 +14,7 @@ You can run the example locally with an Anthropic API key. Alternatively, you ca
 
 ## Setting up your Anthropic/OpenAI API Key
 
-To use Together.ai, Anthropic, or OpenAI models for the project, you need to specify your keys. To do so, create a `.env` file in the project directory, and then enter your API keys:
+To use Together.ai (for the free LLama 3 model), Anthropic, or OpenAI models for the project, you need to specify your keys. To do so, create a `.env` file in the project directory, and then enter your API keys:
 
 ```
 TOGETHER_API_KEY=...
@@ -24,19 +24,19 @@ OPENAI_API_KEY=sk-proj...
 
 ### Changing the Anthropic/OpenAI Model
 
-By default, the project uses Claude 3.5 Sonnet on Anthropic, and gpt-4o-mini on OpenAI.
+By default, the project uses Claude Sonnet 4.5 on Anthropic, and gpt-4o-mini on OpenAI.
 
 You can change the model to use by modifying `ANTHROPIC_MODEL` and `OPENAI_MODEL` in `utils.py`.
 
 ## Running Locally
 
-To run the game `9:05` locally with Anthropic (defaults to Claude 3.5 Sonnet):
+To run the game `9:05` locally with Anthropic (defaults to Claude Sonnet 4.5):
 
 ```
 python local.py games/905.z5 --llm anthropic
 ```
 
-If you want to use an OpenAI model (defaults to gpt-4o-mini):
+If you want to use an OpenAI model (defaults to gpt-5-nano):
 
 ```
 python local.py games/905.z5 --llm openai

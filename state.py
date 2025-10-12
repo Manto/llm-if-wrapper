@@ -8,7 +8,8 @@ import uuid
 class GameState:
     def __init__(self):
         self.id = None  # specifying this game session, in uuid format
-        self.debug_path = None  # file path to debug log
+        self.log_dir = None  # directory path for debug log
+        self.log_filename = None  # filename for debug log
         self.post_debug_log_write = None  # called after writing to debug log; currently used only for server to sync volume
 
         self.env = None  # the jericho Frotz environment
@@ -58,8 +59,8 @@ def init_game_state(game_path, llm_provider, tone=None, id_in_log_path=False):
     env = jericho.FrotzEnv(game_path)
     state.env = env
 
-    # TODO: Update this to use the state ID
-    state.debug_path = f"logs/debug{'-' + state_id if id_in_log_path else ''}.log"
+    state.log_dir = "logs"
+    state.log_filename = f"debug{'-' + state_id if id_in_log_path else ''}.log"
     return state
 
 
@@ -101,6 +102,7 @@ def load_state_by_id(id):
     env.set_state(state_dict["game_state"])
     loaded_state.env = env
 
-    loaded_state.debug_path = f"logs/debug-{id}.log"
+    loaded_state.log_dir = "logs"
+    loaded_state.log_filename = f"debug-{id}.log"
 
     return loaded_state
