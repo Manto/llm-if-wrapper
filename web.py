@@ -25,7 +25,7 @@ web_api_image = (
 @app.function(
     volumes={"/root/logs": vol},
     secrets=[modal.Secret.from_dotenv()],
-    container_idle_timeout=300,
+    scaledown_window=300,
     timeout=600,
     image=web_api_image,
 )
