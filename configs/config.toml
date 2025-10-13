@@ -10,8 +10,11 @@ so that they become more detailed and interesting.
 
 startup = '''
 The following is the text given right at the start of the game.
-Suggest a changed version of this startup text, according to the instructions
-above.
+<startup_text>
+{{{startup_text}}}
+</startup_text>
+
+Suggest a changed version of this startup text, according to the instructions above.
 Return only your response without any preface or introduction.
 '''
 
@@ -160,6 +163,6 @@ Rewrite the player's command into a single line of text that the game accepts an
 
 First, explain why each word of your rewritten command is a good choice.
 
-Then enclose your suggested new command in triple plusses, in a single line of text, as follows:
-+++SUGGESTION+++
+Then enclose your suggested new command in XML tags, in a single line of text, as follows:
+<suggested_command>your rewritten command here</suggested_command>
 '''

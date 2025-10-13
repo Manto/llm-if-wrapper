@@ -35,6 +35,7 @@ llm_image = (
         "huggingface_hub==0.23.2",
     )
     .env({"HF_HUB_ENABLE_HF_TRANSFER": "1"})
+    .add_local_python_source("common", "web", copy=True)
     .run_function(
         download_model_to_image,
         timeout=60 * 60 * 2,
@@ -43,7 +44,6 @@ llm_image = (
             "model_name": MODEL_NAME,
         },
     )
-    .add_local_python_source("common", "web")
 )
 
 with llm_image.imports():
@@ -53,7 +53,7 @@ with llm_image.imports():
     )
 
 
-@app.cls(image=llm_image, gpu="L4", container_idle_timeout=300)
+@app.cls(image=llm_image, gpu="L4", scaledown_window=300)
 class LLM:
     @modal.enter()
     def start_engine(self):

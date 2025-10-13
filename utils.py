@@ -8,8 +8,8 @@ from openai import OpenAI
 from state import get_current_state, llm_config, config
 from llm_serve import LLM
 
-ANTHROPIC_MODEL = "claude-3-5-sonnet-20241022"
-OPENAI_MODEL = "gpt-4o-mini"
+ANTHROPIC_MODEL = "claude-sonnet-4-5-20250929"
+OPENAI_MODEL = "gpt-5-nano"
 TOGETHER_MODEL = "meta-llama/Llama-3.3-70B-Instruct-Turbo-Free"
 
 def format_with_linebreaks(text: str, width: int) -> str:
@@ -23,8 +23,14 @@ def format_with_linebreaks(text: str, width: int) -> str:
 
 def write_to_debug_log(output):
     state = get_current_state()
-    if state.debug_path:
-        with open(state.debug_path, "a+") as f:
+    if state.log_dir and state.log_filename:
+        # Create log directory if it doesn't exist
+        os.makedirs(state.log_dir, exist_ok=True)
+
+        # Construct the full debug path
+        debug_path = os.path.join(state.log_dir, state.log_filename)
+
+        with open(debug_path, "a+") as f:
             f.write(output)
 
         if state.post_debug_log_write:
@@ -80,8 +86,6 @@ def make_llm_inference(system_prompt, user_prompt):
 
         completion = llm_client.chat.completions.create(
             model=OPENAI_MODEL,
-            temperature=llm_config["config"]["temp"],
-            max_tokens=llm_config["config"]["max_tokens"],
             messages=[
                 {"role": "system", "content": system_prompt},
                 prompt,
@@ -97,6 +101,10 @@ def make_llm_inference(system_prompt, user_prompt):
             max_tokens=llm_config["config"]["max_tokens"],
         ):
             response += segment
+    elif state.llm_provider == "webllm":
+        # WebLLM inference is handled client-side in the browser
+        # Return empty response and let the frontend handle it
+        response = "[Check browser console for response]"
     else:
         raise Exception(f"Unsupported LLM provider: {state.llm_provider}")
 

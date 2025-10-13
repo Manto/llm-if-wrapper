@@ -16,9 +16,16 @@ def is_parser_error(command, response):
     Check if the response is a parser error
     Returns True if it is, False otherwise
     """
+    state = get_current_state()
+
     # Use Jericho's logic to determine if the response is a parser error
     if not jericho.util.recognized(response):
         return True
+
+    # For WebLLM, we can't run LLM inference on the backend
+    # so we rely only on Jericho's parser error detection
+    if state.llm_provider == "webllm":
+        return False
 
     # Then we use LLM for this
     result = make_llm_inference(
@@ -96,11 +103,11 @@ def try_to_fix_parser_error(command, response):
 
         # Attempt to parse out the newly suggested command
         # If we can't find a suggested command, we give up and return original
-        new_command = re.findall("\\+\\+\\+(.*?)\\+\\+\\+", llm_response)
+        new_command = re.findall(r"<suggested_command>(.*?)</suggested_command>", llm_response, re.DOTALL)
         if new_command == []:
             break
 
-        new_command = new_command[0]
+        new_command = new_command[0].strip()
         write_to_debug_log(f"LLM COMMAND REWRITING SUGGESTION:\n{new_command}\n\n")
         new_response, _, __, ___ = state.env.step(new_command)
         write_to_debug_log(f"LLM COMMAND REWRITING RESPONSE:\n{new_response}\n\n")

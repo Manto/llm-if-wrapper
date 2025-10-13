@@ -12,11 +12,14 @@ import {
   Code,
   Box,
   Switch,
-  TextField
+  TextField,
+  Progress
 } from '@radix-ui/themes'
 import { GameContentDisplay } from './gameDisplay'
 
 import { GAMES, TONES, LLMS, API_URL } from './settings'
+import { getWebLLMClient } from './webllm'
+import type { InitProgressReport } from '@mlc-ai/web-llm'
 
 const App = () => {
   const [game, setGame] = useState(GAMES[0].id)
@@ -31,13 +34,36 @@ const App = () => {
   const [debug, setDebug] = useState<string>()
   const [gameText, setGameText] = useState<any[]>([])
   const [originalText, setOriginalText] = useState<any[]>([])
+  const [webllmProgress, setWebllmProgress] = useState<string>('')
+  const [webllmReady, setWebllmReady] = useState(false)
   const commandInputRef = useRef<null | HTMLInputElement>(null)
   const mounted = useRef(false)
   const pollLogId = useRef<ReturnType<typeof setInterval>>()
 
   const onMount = async () => {
     // Warm up LLM functions before player begin to start game
-    fetch(`${API_URL}/warm_inference`, { method: 'POST' })
+    // Only call this for non-WebLLM providers
+    if (llm !== 'webllm') {
+      fetch(`${API_URL}/warm_inference`, { method: 'POST' })
+    }
+  }
+
+  const initializeWebLLM = async () => {
+    if (llm !== 'webllm' || webllmReady) {
+      return
+    }
+
+    try {
+      const client = getWebLLMClient()
+      await client.initialize((report: InitProgressReport) => {
+        setWebllmProgress(report.text)
+      })
+      setWebllmReady(true)
+      setWebllmProgress('Model loaded successfully.')
+    } catch (error) {
+      console.error('Failed to initialize WebLLM:', error)
+      setWebllmProgress('Failed to load model. Please try again.')
+    }
   }
 
   useEffect(() => {
@@ -47,6 +73,12 @@ const App = () => {
       onMount()
     }
   }, [])
+
+  useEffect(() => {
+    if (llm === 'webllm') {
+      initializeWebLLM()
+    }
+  }, [llm])
 
   useEffect(() => {
     if (gameStateId) {
@@ -71,6 +103,48 @@ const App = () => {
     return () => clearInterval(pollLogId.current)
   }, [isProcessingCommand])
 
+  const processWithWebLLM = async (gameResponse: string, currentTone: string): Promise<string> => {
+    if (llm !== 'webllm' || currentTone === 'none') {
+      return gameResponse
+    }
+
+    const client = getWebLLMClient()
+    const systemPrompt = `You are helping a person play an interactive fiction by suggesting changes to the responses of the game engine, so that they become more detailed and interesting.`
+
+    let toneInstruction = ''
+    if (currentTone === 'pratchett') {
+      toneInstruction = 'Assume the tone of a tongue-in-cheek adventure story writer, such as Douglas Adams or Terry Pratchett, perhaps with a hint of a swashbuckling romance writer\'s touch.'
+    } else if (currentTone === 'gumshoe') {
+      toneInstruction = 'Assume the terse tone of Hemingway and the ambience of a hard-boiled pulp-fiction novel, such as the Noir of private eye Philip Marlowe.'
+    } else if (currentTone === 'legal') {
+      toneInstruction = 'Assume the tone of legal briefs, use very formal and official languages.'
+    } else if (currentTone === 'spaceopera') {
+      toneInstruction = 'Assume the tone of the ebullient space operas made popular by writers such as E.E. Doc Smith in his Lensman series.'
+    } else if (currentTone === 'original') {
+      toneInstruction = 'Keep the tone of the original response.'
+    }
+
+    const userPrompt = `${toneInstruction}
+
+Keep suggested changed response to no more than several words longer than original response.
+Always retain the formatting of the original response.
+Don't remind the player that they are playing a game.
+Don't ask the player what they will do next.
+
+The following is the text from the game:
+${gameResponse}
+
+Suggest a changed version of this text, according to the instructions above.
+Return only your response without any preface or introduction.`
+
+    try {
+      return await client.chat(systemPrompt, userPrompt)
+    } catch (error) {
+      console.error('WebLLM inference error:', error)
+      return gameResponse // Fallback to original on error
+    }
+  }
+
   const startGame = async () => {
     setIsStartingGame(true)
 
@@ -88,9 +162,16 @@ const App = () => {
       })
       const data = await response.json()
       setGameStateId(data['id'])
+
+      let displayText = data['llm_response']
+      if (llm === 'webllm' && tone !== 'none') {
+        // Use WebLLM to process the game response client-side
+        displayText = await processWithWebLLM(data['game_response'], tone)
+      }
+
       setGameText([
         ...gameText,
-        <span key={gameText.length}>{data['llm_response']}</span>
+        <span key={gameText.length}>{displayText}</span>
       ])
       setOriginalText([
         ...originalText,
@@ -135,6 +216,13 @@ const App = () => {
       })
 
       const data = await response.json()
+
+      let displayText = data['llm_response']
+      if (llm === 'webllm' && tone !== 'none') {
+        // Use WebLLM to process the game response client-side
+        displayText = await processWithWebLLM(data['game_response'], tone)
+      }
+
       setOriginalText([
         ...originalText,
         <span key={originalText.length}>
@@ -147,7 +235,7 @@ const App = () => {
         <span key={gameText.length}>
           <b>&gt; {data['input_command']}</b>
         </span>,
-        <span key={gameText.length + 1}>{data['llm_response']}</span>
+        <span key={gameText.length + 1}>{displayText}</span>
       ])
       setCommand('')
     } finally {
@@ -237,6 +325,19 @@ const App = () => {
                       </Select.Group>
                     </Select.Content>
                   </Select.Root>
+                  {llm === 'webllm' && (
+                    <Box mt='2'>
+                      <Text size='1'>
+                        WebLLM runs entirely in your browser. No API key needed.
+                      </Text>
+                      {webllmProgress && (
+                        <Box mt='2'>
+                          <Text size='1'>{webllmProgress}</Text>
+                          {!webllmReady && <Progress style={{ marginTop: '8px' }} />}
+                        </Box>
+                      )}
+                    </Box>
+                  )}
                   {llm === 'together' && (
                     <Box>
                       <Text size='1'>
@@ -271,7 +372,11 @@ const App = () => {
               </Flex>
 
               <Flex gap='3' mt='4' justify='end'>
-                <Button loading={isStartingGame} onClick={startGame}>
+                <Button
+                  loading={isStartingGame}
+                  disabled={llm === 'webllm' && !webllmReady}
+                  onClick={startGame}
+                >
                   Start Game
                 </Button>
               </Flex>

@@ -14,7 +14,7 @@ You can run the example locally with an Anthropic API key. Alternatively, you ca
 
 ## Setting up your Anthropic/OpenAI API Key
 
-To use Together.ai, Anthropic, or OpenAI models for the project, you need to specify your keys. To do so, create a `.env` file in the project directory, and then enter your API keys:
+To use Together.ai (for the free LLama 3 model), Anthropic, or OpenAI models for the project, you need to specify your keys. To do so, create a `.env` file in the project directory, and then enter your API keys:
 
 ```
 TOGETHER_API_KEY=...
@@ -24,19 +24,19 @@ OPENAI_API_KEY=sk-proj...
 
 ### Changing the Anthropic/OpenAI Model
 
-By default, the project uses Claude 3.5 Sonnet on Anthropic, and gpt-4o-mini on OpenAI.
+By default, the project uses Claude Sonnet 4.5 on Anthropic, and gpt-4o-mini on OpenAI.
 
 You can change the model to use by modifying `ANTHROPIC_MODEL` and `OPENAI_MODEL` in `utils.py`.
 
 ## Running Locally
 
-To run the game `9:05` locally with Anthropic (defaults to Claude 3.5 Sonnet):
+To run the game `9:05` locally with Anthropic (defaults to Claude Sonnet 4.5):
 
 ```
 python local.py games/905.z5 --llm anthropic
 ```
 
-If you want to use an OpenAI model (defaults to gpt-4o-mini):
+If you want to use an OpenAI model (defaults to gpt-5-nano):
 
 ```
 python local.py games/905.z5 --llm openai
@@ -112,20 +112,13 @@ Then navigate to `https://xyz--llm-if-wrapper-web.modal.run` in your browser to 
 
 Open up `llm_serve.py`, and you can change the `MODEL_NAME` to point to another model available on HuggingFace that is supported by vLLM. Be sure to `modal deploy web` again after making the change, and Modal will rebuild the image and deploy accordingly.
 
-## TODO
-
-- [x] Visually distinguish game response from player commands
-- [x] Hook up debug log viewing from the web
-- [x] Add support for OpenAI models
-- [x] Moved detection of parser error to LLM, instead of simplistic string matching.
-
 ## Known Issues
 
 - The rewrite sometimes make up unrelated content or completely lose the structure of original game text, especially when using less capable models.
 - Certain console based display (e.g., the help menu in Lost Pig) will not display correctly.
+- WebLLM implementation is incomplete; the plan is to bring in ifvms / Glk to perform the playback entirely in browser, skipping the need for jericho in a python server.
 
 ## Other Ideas
 
-- Instead of string match to detect parser error, fine-tune an LLM for this.
 - Could fork [Parchment](https://github.com/curiousdannii/parchment) for a fully browser based experience, skipping the need for a backend.
 - Generate images via Stable Diffusion along with room descriptions.
