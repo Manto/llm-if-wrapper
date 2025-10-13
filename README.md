@@ -116,6 +116,7 @@ Open up `llm_serve.py`, and you can change the `MODEL_NAME` to point to another 
 
 - The rewrite sometimes make up unrelated content or completely lose the structure of original game text, especially when using less capable models.
 - Certain console based display (e.g., the help menu in Lost Pig) will not display correctly.
+- WebLLM implementation is incomplete; the plan is to bring in ifvms / Glk to perform the playback entirely in browser, skipping the need for jericho in a python server.
 
 ## Other Ideas
 
