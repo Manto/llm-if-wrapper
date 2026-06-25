@@ -71,8 +71,10 @@ NEXT_PUBLIC_MODAL_USERNAME=<your_account>
 The server contains the logic to interface with the IF interpreter and making calls to LLM to perform the parsing check and rewrites. It also can serve an open source model (`Meta-Llama-3-8B-Instruct` by default) as an option instead of using Anthropic or OpenAI API. To start the server, run the following:
 
 ```
-modal serve web
+modal serve -m web
 ```
+
+> **Note:** Modal 1.x requires the `-m` flag when targeting a Python module (e.g. `web`). On older Modal clients (0.x) the command was `modal serve web`.
 
 The client uses `next.js`, and to start it, run the following:
 
@@ -92,7 +94,7 @@ To deploy the project so you can access it from anywhere, do a build on the fron
 cd frontend
 npm run build
 cd ..
-modal deploy web
+modal deploy -m web
 ```
 
 The output will look something like the following:
@@ -110,7 +112,7 @@ Then navigate to `https://xyz--llm-if-wrapper-web.modal.run` in your browser to 
 
 ### Changing the Hosted Model
 
-Open up `llm_serve.py`, and you can change the `MODEL_NAME` to point to another model available on HuggingFace that is supported by vLLM. Be sure to `modal deploy web` again after making the change, and Modal will rebuild the image and deploy accordingly.
+Open up `llm_serve.py`, and you can change the `MODEL_NAME` to point to another model available on HuggingFace that is supported by vLLM. Be sure to `modal deploy -m web` again after making the change, and Modal will rebuild the image and deploy accordingly.
 
 ## Known Issues
 

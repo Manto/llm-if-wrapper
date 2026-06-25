@@ -134,7 +134,7 @@ class LLM:
         pass
 
 
-# For local testing, run `modal run -q llm_serve --input "Where is zork?"`
+# For local testing, run `modal run -q -m llm_serve --input "Where is zork?"`
 @app.local_entrypoint()
 def main(input: str):
     model = LLM()
